@@ -37,17 +37,19 @@ body{
 
 .eyebrow{font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--ink); font-weight:400}
 button{font:inherit; cursor:pointer; border:none; background:none; color:inherit}
-.btn{
-  font-family:var(--disp); background:var(--carbon); color:var(--file);
+.btn,.btn-ghost{
+  display:inline-block; font-family:var(--disp);
   padding:12px 26px; letter-spacing:.12em; text-transform:uppercase;
-  font-size:13px; font-weight:600; border:1px solid var(--carbon);
-  transition:background .15s, color .15s, transform .1s;
+  font-size:13px; font-weight:600; line-height:1.15;
+  transition:background .15s, color .15s, border-color .15s, transform .1s;
 }
+.btn{background:var(--carbon); color:var(--file); border:1px solid var(--carbon)}
 .btn:hover{background:transparent; color:var(--carbon)}
-.btn:active{transform:translateY(1px)}
-.btn:disabled{opacity:.35; cursor:not-allowed; transform:none}
+.btn:active,.btn-ghost:active{transform:translateY(1px)}
+.btn:disabled,.btn-ghost:disabled{opacity:.35; cursor:not-allowed; transform:none}
 .btn-ghost{background:transparent; color:var(--carbon); border:1px solid var(--steel)}
 .btn-ghost:hover{background:var(--carbon); color:var(--file); border-color:var(--carbon)}
+.btn-sm{padding:7px 15px; font-size:11px; letter-spacing:.1em}
 :focus-visible{outline:2px solid var(--stamp); outline-offset:3px}
 
 .screen{display:none; flex:1; min-height:0}
@@ -113,15 +115,29 @@ button{font:inherit; cursor:pointer; border:none; background:none; color:inherit
 .tcol{flex:1; display:flex; flex-direction:column; min-width:0}
 .tscroll{flex:1; overflow-y:auto; padding:26px 30px 10px}
 .tinner{max-width:730px; margin:0 auto}
-.line{display:flex; gap:14px; padding:9px 0; align-items:flex-start}
-.stamp-time{flex-shrink:0; width:50px; text-align:right; font-size:11px; color:var(--steel); padding-top:4px}
-.body-q{font-size:14.5px; font-weight:400}
-.body-q::before{content:"В. "; color:var(--stamp); font-weight:700}
-.body-a{font-family:var(--sans); font-size:16px; line-height:1.6}
-.body-a::before{content:"О. "; color:var(--stamp); font-weight:600; font-family:var(--mono)}
-.body-a.stage{font-style:italic; color:var(--ink); font-size:14.5px}
-.body-a.stage::before{content:""}
-.note{font-family:var(--mono); font-size:11.5px; letter-spacing:.06em; color:var(--stamp); margin-top:6px; opacity:.85}
+.line{display:flex; gap:9px; padding:5px 0; align-items:flex-end}
+.line.q{flex-direction:row-reverse}          /* вопрос следователя — справа */
+.stamp-time{flex-shrink:0; font-size:10.5px; color:var(--steel); padding-bottom:3px}
+.body-q,.body-a{max-width:72%; padding:10px 14px 11px; position:relative}
+.body-q{
+  font-size:14.5px; line-height:1.5;
+  background:var(--carbon); color:var(--file);
+  border-radius:14px 14px 3px 14px;
+}
+.body-a{
+  font-family:var(--sans); font-size:15.5px; line-height:1.55;
+  background:var(--file); color:var(--carbon);
+  border:1px solid var(--file-edge);
+  border-radius:14px 14px 14px 3px;
+  box-shadow:0 1px 0 rgba(0,0,0,.05);
+}
+.body-a.stage{
+  font-style:italic; color:var(--ink); font-size:13.5px;
+  background:none; border:none; box-shadow:none; padding:6px 0; max-width:100%;
+}
+.line.stage-row{justify-content:center}
+.line.stage-row .stamp-time{display:none}
+.note{font-family:var(--mono); font-size:11px; letter-spacing:.06em; color:var(--stamp); margin-top:7px; opacity:.9}
 .note::before{content:"[ "} .note::after{content:" ]"}
 .sys{text-align:center; font-family:var(--disp); font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:var(--ink); padding:20px 0 6px}
 .caret{display:inline-block; width:8px; background:var(--carbon); animation:blink .9s steps(1) infinite; margin-left:1px}
@@ -172,7 +188,8 @@ button{font:inherit; cursor:pointer; border:none; background:none; color:inherit
   .filecol{width:100%; border-right:none; border-bottom:1px solid var(--file-edge); max-height:245px; padding:16px 18px}
   .tscroll{padding:18px 18px 8px}
   .askbar{padding:12px 18px 16px}
-  .stamp-time{width:42px; font-size:10px}
+  .stamp-time{font-size:10px}
+  .body-q,.body-a{max-width:84%}
   .sheet{padding:26px 20px 24px}
   .sheet h2{font-size:26px}
   .big-stamp{position:static; display:inline-block; margin-bottom:12px; transform:rotate(-3deg)}
@@ -254,7 +271,7 @@ button{font:inherit; cursor:pointer; border:none; background:none; color:inherit
         </div>
         <div class="askhint">
           <span>Enter — задать &nbsp;·&nbsp; Shift+Enter — новая строка</span>
-          <button class="btn-ghost" id="accuse-early" style="padding:5px 12px; font-size:11px">Назвать ложь сейчас</button>
+          <button class="btn-ghost btn-sm" id="accuse-early">Назвать ложь сейчас</button>
         </div>
         <div id="errslot"></div>
       </div>
@@ -338,11 +355,23 @@ function parseJSON(txt){
 /* ---------- ПРОМПТЫ ---------- */
 const CASE_SYS = `Ты придумываешь дела для игры-допроса. Всё пиши по-русски.
 
-Придумай ОДИН свежий инцидент. Декорации бери постсоветские и конкретные, сильно меняй их от раза к разу: вахтовый посёлок, гаражный кооператив, ночная смена в райбольнице, рыболовецкая артель, паром, метеостанция, свадьба в банкетном зале, зернохранилище, съёмочная площадка, автосервис, дачный кооператив, склад маркетплейса, школьная поездка, пожарная часть в райцентре, санаторий не в сезон. Избегай особняков, олигархов и киношных банд.
+Придумай ОДИН свежий инцидент. Декорации постсоветские и конкретные. Избегай особняков, олигархов и киношных банд.
 
-Примерно в половине случаев подозреваемый НЕВИНОВЕН в самом инциденте, но всё равно лжёт — прячет роман, мелкое воровство, долги, запой, стыдный провал или прикрывает близкого человека. Это лучший вариант. Используй его часто.
+ГЛАВНОЕ ТРЕБОВАНИЕ — НЕПОВТОРИМОСТЬ. Эти дела идут подряд одно за другим, и зритель смотрит их серией. Два похожих дела убивают выпуск. Уникальным обязано быть ВСЁ:
+
+1. ПОМЕЩЕНИЕ. Не просто «склад» — назови, чем оно пахнет, что в нём сломано, где именно всё случилось: не «в цеху», а «у второго транспортёра, где течёт кровля». Никогда не повторяй тип помещения из подсказки дословно — уточняй его до конкретной точки.
+2. ЛЮДИ. Имя и фамилия — не из первой десятки частотных. Никаких Ивановых, Петровых, Сидоровых, Смирновых, Кузнецовых, Соколовых. Никаких Сергеев, Андреев, Александров, Елен, Ольг, Марин. Бери фамилии разных регионов: поволжские, сибирские, кубанские, северные, украинские, армянские, татарские, немецкие из поволжских немцев. Возраст гуляй широко: от 19 до 67, не липни к 35-45. Пол чередуй — женщина в кресле подозреваемого должна выпадать не реже мужчины.
+3. ДЕЛО. Мотив лжи каждый раз новый. Не сводить всё к роману на стороне и к деньгам — это два самых затёртых. Бери реже используемое: скрывает диагноз, был на похоронах, которые от семьи скрыл, подделал стаж, спит на смене, боится потерять опеку над ребёнком, покрывает подростка, стыдится безграмотности, нелегально подрабатывает, прячет, что его самого избили, срывает лечение зависимости, дал ложные показания за услугу, боится депортации родственника.
+4. РОЛЬ. Подозреваемый не обязан быть исполнителем. Пусть будет свидетель, начальник, родственник, сменщик, посторонний, подрядчик, проверяющий.
+
+Примерно в половине случаев подозреваемый НЕВИНОВЕН в самом инциденте, но всё равно лжёт. Это лучший вариант. Используй его часто.
 
 Ложь обязана быть находимой: должна существовать конкретная деталь, которая при прямом вопросе не сходится с остальным рассказом.
+
+СЛОЖНОСТЬ задаётся отдельно и меняет только ОДНО — насколько глубоко закопана эта деталь:
+- «лёгкая»: противоречие торчит прямо в publicFacts или evidence. Одного точного вопроса хватает.
+- «средняя»: нужно свести два разных места рассказа. Деталь есть в вещдоках, но её смысл не очевиден.
+- «трудная»: деталь всплывает только если следователь сам догадается спросить о том, чего нет ни в фактах, ни в вещдоках — о третьем человеке, о времени в пути, о том, кто закрывал смену. Ложь при этом остаётся честно находимой, без угадайки.
 
 Верни ТОЛЬКО голый JSON, без markdown, без предисловия:
 {"caseNumber":"4 цифры","incident":"одно нейтральное фактическое предложение о том, что случилось","location":"короткое место","timeframe":"короткий период","subject":{"name":"имя и фамилия","age":34,"gender":"м","role":"кем приходится делу, коротко","manner":"как держится на допросе, 6-12 слов"},"publicFacts":["3-4 коротких факта, которые следователь уже знает"],"evidence":["2-3 коротких предмета в вещдоках"],"truth":"что было на самом деле, 2-3 предложения, прямо укажи, виновен ли подозреваемый в инциденте","theLie":"одно конкретное ложное утверждение, которого он держится","crack":"та самая линия вопросов, на которой рассказ не сходится","protecting":"человеческая причина лжи, одно предложение"}
@@ -378,7 +407,7 @@ function addLine(kind, text, note, stage){
   const t = new Date();
   const stamp = String(t.getHours()).padStart(2,"0")+":"+String(t.getMinutes()).padStart(2,"0");
   const row = document.createElement("div");
-  row.className = "line";
+  row.className = "line " + (kind==="q" ? "q" : "a") + (stage ? " stage-row" : "");
   const cls = kind==="q" ? "body-q" : ("body-a"+(stage?" stage":""));
   row.innerHTML = `<div class="stamp-time">${stamp}</div><div class="${cls}"></div>`;
   const body = row.lastChild;
@@ -396,7 +425,7 @@ function addLine(kind, text, note, stage){
     body.appendChild(caret);
     let i = 0;
     const tick = setInterval(()=>{
-      i += 2; caret.remove();
+      i += 1; caret.remove();
       body.textContent = text.slice(0,i);
       body.appendChild(caret); scrollDown();
       if(i >= text.length){
@@ -418,6 +447,16 @@ function addSys(text){
   d.className = "sys"; d.textContent = text;
   $("tinner").appendChild(d); scrollDown();
 }
+function addGate(label, fn){
+  const d = document.createElement("div");
+  d.className = "sys"; d.style.cssText = "margin-top:18px";
+  const b = document.createElement("button");
+  b.className = "btn"; b.textContent = label;
+  b.onclick = fn;
+  d.appendChild(b);
+  $("tinner").appendChild(d); scrollDown();
+  return b;
+}
 function scrollDown(){ const s = $("tscroll"); s.scrollTop = s.scrollHeight; }
 
 function drawGauge(){
@@ -432,7 +471,7 @@ function showErr(msg, retryFn){
   box.className = "errbox";
   box.innerHTML = `<span>${msg}</span>`;
   const b = document.createElement("button");
-  b.className = "btn-ghost"; b.style.cssText="padding:6px 14px;font-size:11px";
+  b.className = "btn-ghost btn-sm";
   b.textContent = "Попробовать снова";
   b.onclick = ()=>{ $("errslot").innerHTML=""; retryFn(); };
   box.appendChild(b); $("errslot").appendChild(box);
@@ -450,10 +489,55 @@ function startLoad(){
   step(); clearInterval(loadTimer); loadTimer=setInterval(step,1900);
 }
 
+/* жребий: без него модель на одном и том же промпте залипает на «что-то пропало» */
+const SETTINGS = [
+  "вахтовый посёлок","гаражный кооператив","ночная смена в райбольнице","рыболовецкая артель",
+  "паром","метеостанция","свадьба в банкетном зале","зернохранилище","съёмочная площадка",
+  "автосервис","дачный кооператив","склад маркетплейса","школьная поездка","пожарная часть в райцентре",
+  "санаторий не в сезон","автоколонна","районный дом культуры","теплица","карьер","ветлечебница"
+];
+const KINDS = [
+  "пожар","травма на производстве","отравление","подлог в документах","авария техники",
+  "человек не вышел на смену и его не могут найти","драка со сломанной челюстью",
+  "смерть при неясных обстоятельствах","утечка служебных сведений","затопление",
+  "пропажа денег из кассы","слив топлива","испорченная партия товара","падение с высоты",
+  "разбитая машина на территории"
+];
+const MOTIVES = [
+  "скрывает диагноз","был на похоронах, о которых не сказал семье","подделал стаж или документ",
+  "спал на смене","боится потерять опеку над ребёнком","покрывает подростка",
+  "стыдится того, что плохо читает и пишет","нелегально подрабатывает на стороне",
+  "прячет, что его самого избили","срывает лечение зависимости","дал ложные показания за услугу",
+  "боится депортации родственника","взял чужую вину много лет назад","прячет долг перед своими же",
+  "был там, где ему по запрету находиться нельзя"
+];
+const ROLES = ["исполнитель","свидетель","начальник смены","родственник пострадавшего","сменщик","посторонний на территории","подрядчик","проверяющий"];
+const DIFF = ["лёгкая","средняя","средняя","трудная"];
+const pick = a => a[Math.floor(Math.random()*a.length)];
+
+/* память прошлых дел — чтобы серия выпусков не повторялась */
+const SEEN_KEY = "odnalozh_seen";
+function seen(){ try{ return JSON.parse(localStorage.getItem(SEEN_KEY)) || []; }catch(e){ return []; } }
+function remember(c){
+  try{
+    const list = seen();
+    list.push(`${c.subject.name} — ${c.location} — ${c.incident}`);
+    localStorage.setItem(SEEN_KEY, JSON.stringify(list.slice(-14)));
+  }catch(e){}
+}
+
 async function newCase(){
   startLoad();
   try{
-    const c = parseJSON(await claude(CASE_SYS, "Придумай одно дело прямо сейчас. Конкретное и незатёртое."));
+    const past = seen();
+    const avoid = past.length
+      ? `\n\nЭти дела уже были в эфире. Не повторяй ни имена, ни места, ни сюжеты:\n${past.map(s=>"— "+s).join("\n")}`
+      : "";
+    const seed = `Декорация на этот раз: ${pick(SETTINGS)}. Тип инцидента: ${pick(KINDS)}. `
+      + `Подозреваемый по роли — ${pick(ROLES)}. Мотив лжи: ${pick(MOTIVES)}. `
+      + `Сложность: ${pick(DIFF)}.`;
+    const c = parseJSON(await claude(CASE_SYS, `${seed}${avoid}\n\nПридумай одно дело прямо сейчас. Конкретное и незатёртое.`));
+    remember(c);
     clearInterval(loadTimer);
     S = { c, used:0, pressure:0, history:[], over:false };
     mountCase(c);
@@ -478,6 +562,7 @@ function mountCase(c){
   $("tinner").innerHTML = ""; $("errslot").innerHTML = ""; $("acc").value = "";
   $("ask").disabled = false; $("send").disabled = false;
   $("ask").placeholder = "Задайте вопрос…";
+  $("accuse-early").style.display = "";
   drawGauge(); show("s-game");
   addSys("Запись начата");
   addLine("a", `${c.subject.name} заходит и садится напротив.`, "", true);
@@ -522,8 +607,11 @@ async function askQuestion(text){
 function lock(lead){
   $("ask").disabled = true; $("send").disabled = true;
   $("ask").placeholder = "Допрос закрыт";
+  $("accuse-early").style.display = "none";
   $("acc-lead").textContent = lead + " Напишите просто: что произошло на самом деле и что подозреваемый прятал. Частичное попадание засчитывается.";
-  setTimeout(()=>show("s-accuse"), 1300);
+  addSys(lead);
+  // без авто-перехода: игрок сам решает, когда дочитал стенограмму
+  addGate("Перейти к заявлению", ()=>show("s-accuse")).focus();
 }
 
 async function judge(){
@@ -560,7 +648,7 @@ verdict — строго РАСКРЫТО, ЧАСТИЧНО или МИМО. Р�
 $("go").onclick = newCase;
 $("again").onclick = newCase;
 $("submit-acc").onclick = judge;
-$("back-int").onclick = ()=>{ if(S && !S.over) show("s-game"); else judge(); };
+$("back-int").onclick = ()=>show("s-game");
 $("accuse-early").onclick = ()=>{
   $("acc-lead").textContent = "Вы называете ложь досрочно. Напишите просто: что произошло на самом деле и что подозреваемый прятал.";
   show("s-accuse");
