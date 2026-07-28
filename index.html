@@ -1,0 +1,584 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ОДНА ЛОЖЬ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=PT+Mono&family=IBM+Plex+Sans:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --room:#C9CCBE;
+  --room-dark:#B3B7A8;
+  --file:#E3DCC6;
+  --file-edge:#CFC5A8;
+  --carbon:#23241F;
+  --ink:#565B4E;
+  --steel:#8A9086;
+  --stamp:#9C3B24;
+  --stamp-soft:rgba(156,59,36,.14);
+  --mono:"PT Mono","Courier New",ui-monospace,monospace;
+  --disp:"Oswald","Arial Narrow",sans-serif;
+  --sans:"IBM Plex Sans","Segoe UI",Roboto,sans-serif;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:var(--room);
+  background-image:
+    radial-gradient(ellipse 90% 60% at 50% -10%, rgba(255,255,255,.35), transparent 70%),
+    repeating-linear-gradient(0deg, rgba(0,0,0,.016) 0 2px, transparent 2px 4px);
+  color:var(--carbon);
+  font-family:var(--mono);
+  font-size:15px; line-height:1.55;
+  display:flex; flex-direction:column;
+  -webkit-font-smoothing:antialiased;
+}
+
+.eyebrow{font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--ink); font-weight:400}
+button{font:inherit; cursor:pointer; border:none; background:none; color:inherit}
+.btn{
+  font-family:var(--disp); background:var(--carbon); color:var(--file);
+  padding:12px 26px; letter-spacing:.12em; text-transform:uppercase;
+  font-size:13px; font-weight:600; border:1px solid var(--carbon);
+  transition:background .15s, color .15s, transform .1s;
+}
+.btn:hover{background:transparent; color:var(--carbon)}
+.btn:active{transform:translateY(1px)}
+.btn:disabled{opacity:.35; cursor:not-allowed; transform:none}
+.btn-ghost{background:transparent; color:var(--carbon); border:1px solid var(--steel)}
+.btn-ghost:hover{background:var(--carbon); color:var(--file); border-color:var(--carbon)}
+:focus-visible{outline:2px solid var(--stamp); outline-offset:3px}
+
+.screen{display:none; flex:1; min-height:0}
+.screen.on{display:flex}
+
+/* ЗАСТАВКА */
+#s-title{flex-direction:column; align-items:center; justify-content:center; padding:32px; text-align:center}
+.title-card{max-width:640px}
+.wordmark{
+  font-family:var(--disp); font-weight:700;
+  font-size:clamp(52px,11vw,104px); line-height:.88; letter-spacing:.01em;
+  text-transform:uppercase;
+}
+.wordmark em{font-style:normal; color:var(--stamp); display:block}
+.tagline{margin:22px auto 30px; max-width:450px; color:var(--ink); font-size:14px; line-height:1.6}
+.premise{
+  text-align:left; background:var(--file); border:1px solid var(--file-edge);
+  padding:20px 22px; margin-bottom:28px; box-shadow:2px 3px 0 rgba(35,36,31,.1);
+}
+.premise li{list-style:none; padding:5px 0 5px 22px; position:relative; font-size:13.5px; line-height:1.6}
+.premise li::before{content:"—"; position:absolute; left:0; color:var(--stamp)}
+
+/* ЗАГРУЗКА */
+#s-load{flex-direction:column; align-items:center; justify-content:center; gap:18px; padding:32px; text-align:center}
+.load-word{font-family:var(--disp); font-weight:400; font-size:24px; letter-spacing:.05em; text-transform:uppercase}
+.load-bar{width:min(300px,80vw); height:3px; background:var(--room-dark); overflow:hidden}
+.load-bar i{display:block; height:100%; width:34%; background:var(--stamp); animation:sweep 1.15s infinite ease-in-out}
+@keyframes sweep{0%{transform:translateX(-105%)}100%{transform:translateX(320%)}}
+
+/* ИГРА */
+#s-game{flex-direction:column}
+.topbar{
+  display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+  padding:11px 20px; background:var(--carbon); color:var(--file);
+  font-family:var(--disp); font-size:12px; letter-spacing:.14em; text-transform:uppercase;
+}
+.topbar .sep{opacity:.35}
+.topbar .grow{flex:1}
+.gauge{display:flex; gap:3px; align-items:center}
+.gauge i{width:9px; height:13px; background:rgba(227,220,198,.2); display:block}
+.gauge i.lit{background:var(--stamp)}
+.gauge span{margin-left:7px; opacity:.65; font-family:var(--mono); letter-spacing:0}
+
+.board{display:flex; flex:1; min-height:0}
+
+/* ПАПКА */
+.filecol{
+  width:328px; flex-shrink:0; background:var(--file);
+  border-right:1px solid var(--file-edge); overflow-y:auto; padding:22px 20px 30px;
+}
+.file-head{font-family:var(--sans); font-weight:500; font-size:16px; line-height:1.4; margin:8px 0 5px}
+.file-meta{font-size:12px; color:var(--ink); margin-bottom:16px}
+.file-sec{margin-top:20px}
+.file-sec h4{font-family:var(--disp); font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--stamp); margin-bottom:8px; font-weight:600}
+.file-sec ul{margin:0; padding:0}
+.file-sec li{list-style:none; font-size:13px; line-height:1.55; padding:5px 0 5px 15px; position:relative; border-bottom:1px dotted var(--file-edge)}
+.file-sec li::before{content:"·"; position:absolute; left:3px; color:var(--stamp); font-weight:700}
+.subject-card{border:1px solid var(--file-edge); padding:13px 14px; background:rgba(255,255,255,.32)}
+.subject-card b{display:block; font-size:15px; font-family:var(--sans); font-weight:600}
+.subject-card small{display:block; color:var(--ink); font-size:12.5px; margin-top:4px; line-height:1.5}
+
+/* СТЕНОГРАММА */
+.tcol{flex:1; display:flex; flex-direction:column; min-width:0}
+.tscroll{flex:1; overflow-y:auto; padding:26px 30px 10px}
+.tinner{max-width:730px; margin:0 auto}
+.line{display:flex; gap:14px; padding:9px 0; align-items:flex-start}
+.stamp-time{flex-shrink:0; width:50px; text-align:right; font-size:11px; color:var(--steel); padding-top:4px}
+.body-q{font-size:14.5px; font-weight:400}
+.body-q::before{content:"В. "; color:var(--stamp); font-weight:700}
+.body-a{font-family:var(--sans); font-size:16px; line-height:1.6}
+.body-a::before{content:"О. "; color:var(--stamp); font-weight:600; font-family:var(--mono)}
+.body-a.stage{font-style:italic; color:var(--ink); font-size:14.5px}
+.body-a.stage::before{content:""}
+.note{font-family:var(--mono); font-size:11.5px; letter-spacing:.06em; color:var(--stamp); margin-top:6px; opacity:.85}
+.note::before{content:"[ "} .note::after{content:" ]"}
+.sys{text-align:center; font-family:var(--disp); font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:var(--ink); padding:20px 0 6px}
+.caret{display:inline-block; width:8px; background:var(--carbon); animation:blink .9s steps(1) infinite; margin-left:1px}
+@keyframes blink{50%{opacity:0}}
+
+/* ВВОД */
+.askbar{border-top:1px solid var(--steel); padding:16px 30px 20px; background:var(--room-dark)}
+.askinner{max-width:730px; margin:0 auto; display:flex; gap:10px; align-items:flex-end}
+.askinner textarea{
+  flex:1; resize:none; font:inherit; font-size:15px; color:var(--carbon);
+  background:var(--file); border:1px solid var(--file-edge); padding:12px 14px;
+  min-height:48px; max-height:130px; line-height:1.45;
+}
+.askinner textarea::placeholder{color:var(--steel)}
+.askhint{max-width:730px; margin:9px auto 0; font-size:11px; color:var(--ink); display:flex; justify-content:space-between; gap:12px; align-items:center}
+
+/* ОБВИНЕНИЕ / ВЕРДИКТ */
+#s-accuse,#s-verdict{align-items:center; justify-content:center; padding:34px 24px; overflow-y:auto}
+.sheet{
+  width:min(680px,100%); background:var(--file); border:1px solid var(--file-edge);
+  padding:34px 34px 30px; box-shadow:3px 4px 0 rgba(35,36,31,.12); position:relative;
+}
+.sheet h2{font-family:var(--disp); font-weight:600; font-size:34px; text-transform:uppercase; margin:8px 0 14px; line-height:1.1}
+.sheet p{font-size:14.5px; line-height:1.65; margin-bottom:14px}
+.sheet textarea{
+  width:100%; min-height:130px; resize:vertical; font:inherit; font-size:15px;
+  background:rgba(255,255,255,.4); border:1px solid var(--file-edge); padding:13px; color:var(--carbon);
+}
+.big-stamp{
+  position:absolute; top:20px; right:22px; transform:rotate(-9deg);
+  border:3px solid var(--stamp); color:var(--stamp); padding:4px 14px;
+  font-family:var(--disp); font-weight:700; font-size:21px; letter-spacing:.08em; opacity:.85;
+}
+.truth-block{background:rgba(156,59,36,.07); border-left:3px solid var(--stamp); padding:14px 16px; margin:16px 0}
+.truth-block h4{font-family:var(--disp); font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--stamp); margin-bottom:7px; font-weight:600}
+.truth-block p{font-size:14px; margin:0 0 10px; line-height:1.6}
+.truth-block p:last-child{margin:0}
+.actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:22px}
+
+.errbox{
+  max-width:730px; margin:12px auto 0; border:1px solid var(--stamp);
+  background:var(--stamp-soft); padding:11px 14px; font-size:13px;
+  display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap;
+}
+
+@media (max-width:820px){
+  .board{flex-direction:column}
+  .filecol{width:100%; border-right:none; border-bottom:1px solid var(--file-edge); max-height:245px; padding:16px 18px}
+  .tscroll{padding:18px 18px 8px}
+  .askbar{padding:12px 18px 16px}
+  .stamp-time{width:42px; font-size:10px}
+  .sheet{padding:26px 20px 24px}
+  .sheet h2{font-size:26px}
+  .big-stamp{position:static; display:inline-block; margin-bottom:12px; transform:rotate(-3deg)}
+  .askhint{flex-direction:column; align-items:stretch; gap:8px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none !important; transition:none !important}}
+</style>
+
+<!-- ЗАСТАВКА -->
+<section class="screen on" id="s-title">
+  <div class="title-card">
+    <h1 class="wordmark">Одна<em>Ложь</em></h1>
+    <p class="tagline">Двадцать вопросов. Один подозреваемый. Одна ложь, которую он так просто не отдаст.</p>
+    <div class="premise">
+      <div class="eyebrow" style="margin-bottom:10px">Как это устроено</div>
+      <ul>
+        <li>Каждый запуск — новое дело. Ничего не повторяется.</li>
+        <li>У вас двадцать вопросов. Спрашивайте что угодно, своими словами.</li>
+        <li>Подозреваемый лжёт ровно об одном — и умеет эту ложь держать.</li>
+        <li>Передавите — потребует адвоката, и допрос закончится там, где стоит.</li>
+        <li>В конце вы называете ложь. После этого папка открывается.</li>
+      </ul>
+    </div>
+    <button class="btn" id="go">Открыть дело</button>
+  </div>
+</section>
+
+<!-- ЗАГРУЗКА -->
+<section class="screen" id="s-load">
+  <div class="load-word" id="loadword">Поднимаю дело</div>
+  <div class="load-bar"><i></i></div>
+  <div class="eyebrow" id="loadsub">Архив</div>
+</section>
+
+<!-- ИГРА -->
+<section class="screen" id="s-game">
+  <div class="topbar">
+    <span id="tb-case">ДЕЛО —</span>
+    <span class="sep">/</span>
+    <span id="tb-name">—</span>
+    <span class="grow"></span>
+    <span id="tb-q">Вопрос 0 / 20</span>
+    <span class="sep">/</span>
+    <span style="opacity:.6">Выдержка</span>
+    <span class="gauge" id="gauge"></span>
+  </div>
+
+  <div class="board">
+    <aside class="filecol">
+      <div class="eyebrow">Материалы дела</div>
+      <h3 class="file-head" id="f-incident">—</h3>
+      <div class="file-meta" id="f-meta">—</div>
+
+      <div class="file-sec">
+        <h4>Подозреваемый</h4>
+        <div class="subject-card">
+          <b id="f-name">—</b>
+          <small id="f-role">—</small>
+        </div>
+      </div>
+
+      <div class="file-sec">
+        <h4>Известно</h4>
+        <ul id="f-facts"></ul>
+      </div>
+
+      <div class="file-sec">
+        <h4>В вещдоках</h4>
+        <ul id="f-evi"></ul>
+      </div>
+    </aside>
+
+    <div class="tcol">
+      <div class="tscroll" id="tscroll"><div class="tinner" id="tinner"></div></div>
+      <div class="askbar">
+        <div class="askinner">
+          <textarea id="ask" rows="1" placeholder="Задайте вопрос…"></textarea>
+          <button class="btn" id="send">Спросить</button>
+        </div>
+        <div class="askhint">
+          <span>Enter — задать &nbsp;·&nbsp; Shift+Enter — новая строка</span>
+          <button class="btn-ghost" id="accuse-early" style="padding:5px 12px; font-size:11px">Назвать ложь сейчас</button>
+        </div>
+        <div id="errslot"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ОБВИНЕНИЕ -->
+<section class="screen" id="s-accuse">
+  <div class="sheet">
+    <div class="eyebrow">Заявление следователя</div>
+    <h2>В чём была ложь?</h2>
+    <p id="acc-lead">Напишите просто. Что произошло на самом деле и что подозреваемый прятал. Частичное попадание засчитывается — поймайте суть, форма не важна.</p>
+    <textarea id="acc" placeholder="Он говорил, что… но на самом деле…"></textarea>
+    <div class="actions">
+      <button class="btn" id="submit-acc">Подать заявление</button>
+      <button class="btn-ghost" id="back-int">Вернуться к допросу</button>
+    </div>
+  </div>
+</section>
+
+<!-- ВЕРДИКТ -->
+<section class="screen" id="s-verdict">
+  <div class="sheet">
+    <div class="big-stamp" id="v-stamp">—</div>
+    <div class="eyebrow">Дело закрыто</div>
+    <h2 id="v-head">—</h2>
+    <p id="v-break"></p>
+    <div class="truth-block">
+      <h4>Что было на самом деле</h4>
+      <p id="v-truth"></p>
+      <h4 style="margin-top:15px">Ложь</h4>
+      <p id="v-lie"></p>
+      <h4 style="margin-top:15px">Ради чего она держалась</h4>
+      <p id="v-why"></p>
+    </div>
+    <div class="actions">
+      <button class="btn" id="again">Открыть новое дело</button>
+    </div>
+  </div>
+</section>
+
+<script>
+const MAX_Q = 20, LAWYER_AT = 100;
+const $ = id => document.getElementById(id);
+let S = null;
+
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on', s.id===id));
+  window.scrollTo(0,0);
+}
+
+/* ---------- API ---------- */
+async function claude(system, userContent, tries=3){
+  let last;
+  for(let i=0;i<tries;i++){
+    try{
+      const r = await fetch("https://api.anthropic.com/v1/messages",{
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({
+          model:"claude-sonnet-4-6", max_tokens:1000,
+          system, messages:[{role:"user",content:userContent}]
+        })
+      });
+      if(!r.ok) throw new Error("status "+r.status);
+      const d = await r.json();
+      const txt = (d.content||[]).filter(b=>b.type==="text").map(b=>b.text).join("\n");
+      if(!txt.trim()) throw new Error("empty");
+      return txt;
+    }catch(e){ last=e; await new Promise(res=>setTimeout(res, 700*(i+1))); }
+  }
+  throw last;
+}
+function parseJSON(txt){
+  let t = txt.replace(/```json|```/g,"").trim();
+  const a = t.indexOf("{"), b = t.lastIndexOf("}");
+  if(a>-1 && b>a) t = t.slice(a,b+1);
+  return JSON.parse(t);
+}
+
+/* ---------- ПРОМПТЫ ---------- */
+const CASE_SYS = `Ты придумываешь дела для игры-допроса. Всё пиши по-русски.
+
+Придумай ОДИН свежий инцидент. Декорации бери постсоветские и конкретные, сильно меняй их от раза к разу: вахтовый посёлок, гаражный кооператив, ночная смена в райбольнице, рыболовецкая артель, паром, метеостанция, свадьба в банкетном зале, зернохранилище, съёмочная площадка, автосервис, дачный кооператив, склад маркетплейса, школьная поездка, пожарная часть в райцентре, санаторий не в сезон. Избегай особняков, олигархов и киношных банд.
+
+Примерно в половине случаев подозреваемый НЕВИНОВЕН в самом инциденте, но всё равно лжёт — прячет роман, мелкое воровство, долги, запой, стыдный провал или прикрывает близкого человека. Это лучший вариант. Используй его часто.
+
+Ложь обязана быть находимой: должна существовать конкретная деталь, которая при прямом вопросе не сходится с остальным рассказом.
+
+Верни ТОЛЬКО голый JSON, без markdown, без предисловия:
+{"caseNumber":"4 цифры","incident":"одно нейтральное фактическое предложение о том, что случилось","location":"короткое место","timeframe":"короткий период","subject":{"name":"имя и фамилия","age":34,"gender":"м","role":"кем приходится делу, коротко","manner":"как держится на допросе, 6-12 слов"},"publicFacts":["3-4 коротких факта, которые следователь уже знает"],"evidence":["2-3 коротких предмета в вещдоках"],"truth":"что было на самом деле, 2-3 предложения, прямо укажи, виновен ли подозреваемый в инциденте","theLie":"одно конкретное ложное утверждение, которого он держится","crack":"та самая линия вопросов, на которой рассказ не сходится","protecting":"человеческая причина лжи, одно предложение"}
+
+gender — строго "м" или "ж", по имени подозреваемого.`;
+
+function suspectSys(c){
+  const g = c.subject.gender === "ж";
+  return `Ты — ${c.subject.name}, ${c.subject.age} ${c.subject.age%10===1&&c.subject.age%100!==11?"год":"лет"}, ${c.subject.role}. Ты ${g?"сидишь":"сидишь"} в комнате для допросов. Разбирают: ${c.incident} (${c.location}, ${c.timeframe}).
+
+ПРАВДА — ты её знаешь и никогда не выкладываешь прямо: ${c.truth}
+ТВОЯ ЛОЖЬ, которой ты держишься: ${c.theLie}
+ЧТО ТЫ ПРИКРЫВАЕШЬ: ${c.protecting}
+ГДЕ ТВОЙ РАССКАЗ НЕ СХОДИТСЯ: ${c.crack}
+КАК ТЫ ДЕРЖИШЬСЯ: ${c.subject.manner}
+
+Правила:
+- Говори живым разговорным русским, а не книжным. Так говорит замотанный человек под стрессом: коротко, обрывками, с «ну», «слушайте», «да я же говорил». 1-4 предложения. Иногда отвечаешь вбок, иногда слишком быстро, иногда вообще не отвечаешь.
+- Держись абсолютно последовательно со всем, что уже сказал${g?"а":""} в этой стенограмме.
+- Никогда не выдавай правду сам${g?"а":""}. Никогда не упоминай, что ты ИИ, модель или игра. Не описывай свои же жесты словами.
+- Если вопрос подходит к слабому месту — видно напряжение. Начинаешь объяснять лишнее, поправляешь себя, отвечаешь сухо, злишься или спрашиваешь, при чём тут это.
+- Если следователь прямо назвал реальное противоречие, которое ты дейс­твительно допустил${g?"а":""} — уступи только этот кусок. Не разваливайся в полное признание, пока тебя не прижали именно по этой точке.
+- Если с тобой неожиданно по-человечески говорят о том, что ты прикрываешь, — ты смягчаешься и выдаёшь больше, чем хотел${g?"а":""}.
+- Если оскорбляют, угрожают или повторяют одно и то же — ты закрываешься и даёшь меньше.
+
+Верни ТОЛЬКО голый JSON: {"reply":"что ты говоришь","pressure":0,"note":""}
+"pressure": целое 0-12, насколько сильно вопрос тебя выбил. Пустой вопрос — 0-1. Вопрос, попавший в слабое место, — 7-12.
+"note": 3-6 слов о том, что следователь видит со стороны («уводит взгляд», «отвечает слишком быстро», «переспрашивает вопрос»), или "" — в большинстве ходов пусто. Используй редко, примерно раз в три хода.`;
+}
+
+/* ---------- ОТРИСОВКА ---------- */
+function addLine(kind, text, note, stage){
+  const t = new Date();
+  const stamp = String(t.getHours()).padStart(2,"0")+":"+String(t.getMinutes()).padStart(2,"0");
+  const row = document.createElement("div");
+  row.className = "line";
+  const cls = kind==="q" ? "body-q" : ("body-a"+(stage?" stage":""));
+  row.innerHTML = `<div class="stamp-time">${stamp}</div><div class="${cls}"></div>`;
+  const body = row.lastChild;
+  $("tinner").appendChild(row);
+
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  return new Promise(done=>{
+    if(kind==="q" || stage || reduce){
+      body.textContent = text;
+      if(note) appendNote(row, note);
+      scrollDown(); done(); return;
+    }
+    const caret = document.createElement("span");
+    caret.className = "caret"; caret.textContent = "\u00A0";
+    body.appendChild(caret);
+    let i = 0;
+    const tick = setInterval(()=>{
+      i += 2; caret.remove();
+      body.textContent = text.slice(0,i);
+      body.appendChild(caret); scrollDown();
+      if(i >= text.length){
+        clearInterval(tick); caret.remove();
+        body.textContent = text;
+        if(note) appendNote(row, note);
+        scrollDown(); done();
+      }
+    }, 16);
+  });
+}
+function appendNote(row, note){
+  const n = document.createElement("div");
+  n.className = "note"; n.textContent = note;
+  row.lastChild.appendChild(n);
+}
+function addSys(text){
+  const d = document.createElement("div");
+  d.className = "sys"; d.textContent = text;
+  $("tinner").appendChild(d); scrollDown();
+}
+function scrollDown(){ const s = $("tscroll"); s.scrollTop = s.scrollHeight; }
+
+function drawGauge(){
+  const p = Math.min(S.pressure, LAWYER_AT);
+  const filled = Math.round(p/LAWYER_AT*10);
+  $("gauge").innerHTML = Array.from({length:10},(_,i)=>`<i class="${i<filled?"lit":""}"></i>`).join("")+`<span>${p}%</span>`;
+  $("tb-q").textContent = `Вопрос ${S.used} / ${MAX_Q}`;
+}
+function showErr(msg, retryFn){
+  $("errslot").innerHTML = "";
+  const box = document.createElement("div");
+  box.className = "errbox";
+  box.innerHTML = `<span>${msg}</span>`;
+  const b = document.createElement("button");
+  b.className = "btn-ghost"; b.style.cssText="padding:6px 14px;font-size:11px";
+  b.textContent = "Попробовать снова";
+  b.onclick = ()=>{ $("errslot").innerHTML=""; retryFn(); };
+  box.appendChild(b); $("errslot").appendChild(box);
+}
+
+/* ---------- ХОД ИГРЫ ---------- */
+const LOADING = [
+  ["Поднимаю дело","Архив"],["Комнату освободили","Хозчасть"],
+  ["Проверяю запись","Вещдоки"],["Подозреваемого завели","Наблюдение"]
+];
+let loadTimer;
+function startLoad(){
+  let i=0; show("s-load");
+  const step=()=>{ $("loadword").textContent=LOADING[i][0]; $("loadsub").textContent=LOADING[i][1]; i=(i+1)%LOADING.length; };
+  step(); clearInterval(loadTimer); loadTimer=setInterval(step,1900);
+}
+
+async function newCase(){
+  startLoad();
+  try{
+    const c = parseJSON(await claude(CASE_SYS, "Придумай одно дело прямо сейчас. Конкретное и незатёртое."));
+    clearInterval(loadTimer);
+    S = { c, used:0, pressure:0, history:[], over:false };
+    mountCase(c);
+  }catch(e){
+    clearInterval(loadTimer);
+    $("loadword").textContent = "Дело не подняли";
+    $("loadsub").innerHTML = "";
+    const b=document.createElement("button"); b.className="btn"; b.textContent="Запросить ещё раз";
+    b.onclick=newCase; $("loadsub").appendChild(b);
+  }
+}
+
+function mountCase(c){
+  $("tb-case").textContent = "ДЕЛО № " + c.caseNumber;
+  $("tb-name").textContent = c.subject.name;
+  $("f-incident").textContent = c.incident;
+  $("f-meta").textContent = c.location + " · " + c.timeframe;
+  $("f-name").textContent = `${c.subject.name}, ${c.subject.age}`;
+  $("f-role").textContent = c.subject.role;
+  $("f-facts").innerHTML = (c.publicFacts||[]).map(f=>`<li>${f}</li>`).join("");
+  $("f-evi").innerHTML = (c.evidence||[]).map(f=>`<li>${f}</li>`).join("");
+  $("tinner").innerHTML = ""; $("errslot").innerHTML = ""; $("acc").value = "";
+  $("ask").disabled = false; $("send").disabled = false;
+  $("ask").placeholder = "Задайте вопрос…";
+  drawGauge(); show("s-game");
+  addSys("Запись начата");
+  addLine("a", `${c.subject.name} заходит и садится напротив.`, "", true);
+  setTimeout(()=>$("ask").focus(), 200);
+}
+
+async function askQuestion(text){
+  $("errslot").innerHTML = "";
+  $("send").disabled = true; $("ask").disabled = true;
+  await addLine("q", text);
+  S.history.push({role:"user", content:text});
+
+  const convo = S.history.map(m=>(m.role==="user"?"СЛЕДОВАТЕЛЬ: ":"ТЫ: ")+m.content).join("\n");
+  try{
+    const raw = await claude(suspectSys(S.c), `Стенограмма на данный момент:\n${convo}\n\nОтветь на последний вопрос от лица ${S.c.subject.name}. Только голый JSON.`);
+    const r = parseJSON(raw);
+    S.history.push({role:"assistant", content:r.reply});
+    S.used++;
+    S.pressure = Math.min(LAWYER_AT, S.pressure + (Number(r.pressure)||0));
+    drawGauge();
+    await addLine("a", r.reply, (r.note||"").trim());
+
+    const g = S.c.subject.gender === "ж";
+    if(S.pressure >= LAWYER_AT){
+      S.over = true;
+      addSys("Требует адвоката — запись прервана");
+      lock(`${g?"Она закрылась":"Он закрылся"}. Подавайте то, что успели вытащить.`);
+    } else if(S.used >= MAX_Q){
+      S.over = true;
+      addSys("Двадцать вопросов израсходованы — запись окончена");
+      lock("Время вышло.");
+    } else {
+      $("send").disabled=false; $("ask").disabled=false; $("ask").focus();
+    }
+  }catch(e){
+    S.history.pop();
+    $("tinner").lastChild.remove();
+    showErr("Звук пропал — этот вопрос не записался.", ()=>{ askQuestion(text); });
+    $("send").disabled=false; $("ask").disabled=false;
+  }
+}
+function lock(lead){
+  $("ask").disabled = true; $("send").disabled = true;
+  $("ask").placeholder = "Допрос закрыт";
+  $("acc-lead").textContent = lead + " Напишите просто: что произошло на самом деле и что подозреваемый прятал. Частичное попадание засчитывается.";
+  setTimeout(()=>show("s-accuse"), 1300);
+}
+
+async function judge(){
+  const guess = $("acc").value.trim();
+  if(!guess) return;
+  startLoad(); clearInterval(loadTimer);
+  $("loadword").textContent="Вскрываю опечатанную папку"; $("loadsub").textContent="Архив";
+  const c = S.c;
+  const sys = `Ты судишь игру-допрос. Честно, без подхалимажа. Отвечай по-русски.
+ПРАВДА: ${c.truth}
+ЛОЖЬ: ${c.theLie}
+ПРИКРЫВАЛ: ${c.protecting}
+Верни ТОЛЬКО голый JSON: {"verdict":"РАСКРЫТО","headline":"одно предложение игроку, на «вы»","breakdown":"2-3 предложения: что угадал верно, что упустил, и какой один вопрос вскрыл бы дело"}
+verdict — строго РАСКРЫТО, ЧАСТИЧНО или МИМО. РАСКРЫТО — если ложь названа по сути. ЧАСТИЧНО — верное направление, неверные детали.`;
+  try{
+    const v = parseJSON(await claude(sys, `Заявление игрока:\n"${guess}"\n\nВынеси решение. Только голый JSON.`));
+    clearInterval(loadTimer);
+    $("v-stamp").textContent = v.verdict;
+    $("v-head").textContent = v.headline;
+    $("v-break").textContent = v.breakdown;
+  }catch(e){
+    clearInterval(loadTimer);
+    $("v-stamp").textContent = "ПОДАНО";
+    $("v-head").textContent = "Решение не вернулось, но папка всё равно открывается.";
+    $("v-break").textContent = "Сверьте с тем, что написали сами.";
+  }
+  $("v-truth").textContent = c.truth;
+  $("v-lie").textContent = c.theLie;
+  $("v-why").textContent = c.protecting;
+  show("s-verdict");
+}
+
+/* ---------- СВЯЗКИ ---------- */
+$("go").onclick = newCase;
+$("again").onclick = newCase;
+$("submit-acc").onclick = judge;
+$("back-int").onclick = ()=>{ if(S && !S.over) show("s-game"); else judge(); };
+$("accuse-early").onclick = ()=>{
+  $("acc-lead").textContent = "Вы называете ложь досрочно. Напишите просто: что произошло на самом деле и что подозреваемый прятал.";
+  show("s-accuse");
+};
+$("send").onclick = ()=>{
+  const t = $("ask").value.trim();
+  if(!t || !S || S.over) return;
+  $("ask").value = ""; $("ask").style.height="auto";
+  askQuestion(t);
+};
+$("ask").addEventListener("keydown", e=>{
+  if(e.key==="Enter" && !e.shiftKey){ e.preventDefault(); $("send").click(); }
+});
+$("ask").addEventListener("input", e=>{
+  e.target.style.height="auto";
+  e.target.style.height = Math.min(e.target.scrollHeight,130)+"px";
+});
+document.addEventListener("keydown", e=>{
+  if(e.key==="Enter" && $("s-title").classList.contains("on")) $("go").click();
+});
+</script>
