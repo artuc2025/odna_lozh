@@ -202,7 +202,61 @@ button{font:inherit; cursor:pointer; border:none; background:none; color:inherit
   display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap;
 }
 
+/* ═══ АВТОПИЛОТ: ПУЛЬТ, ЛАМПА, СУФЛЁРСКИЙ ЛИСТОК ═══ */
+.pill{
+  display:flex; align-items:center; gap:7px; padding:4px 10px;
+  border:1px solid rgba(227,220,198,.32); color:var(--file);
+  font-family:var(--disp); font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+  transition:background .15s, border-color .15s;
+}
+.pill:hover{background:rgba(227,220,198,.14); border-color:rgba(227,220,198,.6)}
+.pill i{width:6px; height:6px; border-radius:50%; background:var(--steel); display:block; flex-shrink:0}
+.pill.live i{background:var(--stamp); animation:pulse 1.3s infinite}
+.pill.hold i{background:#C7A93F}
+.pill.gear{letter-spacing:0; font-family:var(--mono); font-size:13px; padding:4px 9px}
+@keyframes pulse{50%{opacity:.2}}
+
+.slip{display:none; border-top:1px solid var(--file-edge); background:var(--file); padding:13px 30px 14px}
+.slip.on{display:block}
+.slipinner{max-width:730px; margin:0 auto}
+.sliphead{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:9px}
+.slipstate{font-family:var(--disp); font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink)}
+.slipstate b{color:var(--stamp); font-weight:600}
+.sliprows{display:grid; grid-template-columns:auto 1fr; gap:5px 13px; align-items:baseline}
+.sliprows dt{
+  font-family:var(--disp); font-size:10px; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--stamp); font-weight:600; white-space:nowrap;
+}
+.sliprows dd{margin:0; font-size:13px; line-height:1.5}
+.sliprows dd.cam{font-family:var(--sans); font-style:italic; font-size:14.5px; line-height:1.5}
+.sliprows dd.flag{color:var(--stamp)}
+
+.cfgwrap{position:fixed; inset:0; z-index:60; background:rgba(35,36,31,.55); display:none; align-items:center; justify-content:center; padding:24px}
+.cfgwrap.on{display:flex}
+.cfg{
+  width:min(540px,100%); max-height:88vh; overflow-y:auto; background:var(--file);
+  border:1px solid var(--file-edge); box-shadow:4px 5px 0 rgba(35,36,31,.2); padding:24px 26px 22px;
+}
+.cfg h3{font-family:var(--disp); font-weight:600; font-size:26px; text-transform:uppercase; line-height:1.1; margin:6px 0 3px}
+.cfg-sub{font-size:12.5px; color:var(--ink); line-height:1.55; margin-bottom:6px}
+.cfg-row{padding:14px 0; border-bottom:1px dotted var(--file-edge)}
+.cfg-row .k{display:block; font-family:var(--disp); font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink); margin-bottom:8px}
+.seg{display:flex; border:1px solid var(--steel); width:fit-content}
+.seg button{font-family:var(--disp); font-size:11px; letter-spacing:.12em; text-transform:uppercase; padding:8px 17px; color:var(--ink); transition:background .15s, color .15s}
+.seg button + button{border-left:1px solid var(--steel)}
+.seg button.on{background:var(--carbon); color:var(--file)}
+.pair{display:flex; align-items:center; gap:9px; flex-wrap:wrap; font-size:12.5px; color:var(--ink)}
+.pair input[type=number]{
+  width:74px; font:inherit; font-size:14px; padding:6px 8px; color:var(--carbon);
+  background:rgba(255,255,255,.45); border:1px solid var(--file-edge);
+}
+.chk{display:flex; align-items:flex-start; gap:10px; cursor:pointer; font-size:13.5px; line-height:1.5; padding:5px 0}
+.chk input{width:16px; height:16px; margin-top:2px; accent-color:var(--stamp); flex-shrink:0}
+.cfg-note{font-size:12px; color:var(--ink); line-height:1.6; margin-top:15px}
+
 @media (max-width:820px){
+  .slip{padding:11px 18px 12px}
+  .cfg{padding:20px 18px 18px}
   .board{flex-direction:column}
   .filecol{width:100%; border-right:none; border-bottom:1px solid var(--file-edge); max-height:245px; padding:16px 18px}
   .tscroll{padding:18px 18px 8px}
@@ -259,6 +313,9 @@ button{font:inherit; cursor:pointer; border:none; background:none; color:inherit
     <span class="sep">/</span>
     <span style="opacity:.6" data-i18n="composure">Выдержка</span>
     <span class="gauge" id="gauge"></span>
+    <span class="sep">/</span>
+    <button class="pill" id="autopill"><i></i><span id="autopill-t">—</span></button>
+    <button class="pill gear" id="cfg-btn" title="Автопилот">⚙</button>
   </div>
 
   <div class="board">
@@ -288,6 +345,21 @@ button{font:inherit; cursor:pointer; border:none; background:none; color:inherit
 
     <div class="tcol">
       <div class="tscroll" id="tscroll"><div class="tinner" id="tinner"></div></div>
+
+      <!-- СУФЛЁРСКИЙ ЛИСТОК: то, что второй следователь передаёт ведущему -->
+      <div class="slip" id="slip">
+        <div class="slipinner">
+          <div class="sliphead">
+            <span class="slipstate" id="slip-state">—</span>
+            <span style="display:flex;gap:8px">
+              <button class="btn-ghost btn-sm" id="slip-ask" data-i18n="slipAskNow">Дай вопрос</button>
+              <button class="btn-ghost btn-sm" id="slip-stop" data-i18n="slipStop">Стоп</button>
+            </span>
+          </div>
+          <dl class="sliprows" id="slip-rows"></dl>
+        </div>
+      </div>
+
       <div class="askbar">
         <div class="askinner">
           <textarea id="ask" rows="1" data-i18n-ph="askPh" placeholder="Задайте вопрос…"></textarea>
@@ -332,12 +404,84 @@ button{font:inherit; cursor:pointer; border:none; background:none; color:inherit
       <h4 style="margin-top:15px" data-i18n="whyHead">Ради чего она держалась</h4>
       <p id="v-why"></p>
     </div>
+    <div class="truth-block" id="v-flags" style="display:none">
+      <h4 data-i18n="flagsHead">Метки для монтажа</h4>
+      <p id="v-flaglist"></p>
+    </div>
     <div class="actions">
       <button class="btn" id="again" data-i18n="newCase">Открыть новое дело</button>
       <button class="btn-ghost" id="to-title" data-i18n="toTitle">На заставку</button>
     </div>
   </div>
 </section>
+
+<!-- ПУЛЬТ АВТОПИЛОТА -->
+<div class="cfgwrap" id="cfgwrap">
+  <div class="cfg">
+    <div class="eyebrow" data-i18n="cfgEyebrow">Второй следователь</div>
+    <h3 data-i18n="cfgHead">Пульт</h3>
+    <p class="cfg-sub" data-i18n="cfgSub">Правды он не знает. Видит то же, что и зритель: папку и стенограмму.</p>
+
+    <div class="cfg-row">
+      <span class="k" data-i18n="cfgMode">Режим</span>
+      <div class="seg" id="cfg-mode">
+        <button data-mode="off" data-i18n="modeOff">Выкл</button>
+        <button data-mode="prompter" data-i18n="modePrompter">Суфлёр</button>
+        <button data-mode="auto" data-i18n="modeAuto">Авто</button>
+      </div>
+      <p class="cfg-note" style="margin-top:9px" data-i18n="cfgModeNote">Суфлёр — печатает вопрос в поле и ждёт, пока вы отправите. Авто — отправляет сам.</p>
+    </div>
+
+    <div class="cfg-row">
+      <span class="k" data-i18n="cfgThink">Думает перед тем, как печатать</span>
+      <div class="pair">
+        <span data-i18n="cfgFrom">от</span><input type="number" id="cfg-think-min" min="0" max="120" step="0.5">
+        <span data-i18n="cfgTo">до</span><input type="number" id="cfg-think-max" min="0" max="120" step="0.5">
+        <span data-i18n="cfgSec">сек</span>
+      </div>
+    </div>
+
+    <div class="cfg-row">
+      <span class="k" data-i18n="cfgSpeed">Скорость печати</span>
+      <div class="pair">
+        <span data-i18n="cfgFrom">от</span><input type="number" id="cfg-wpm-min" min="10" max="200" step="1">
+        <span data-i18n="cfgTo">до</span><input type="number" id="cfg-wpm-max" min="10" max="200" step="1">
+        <span data-i18n="cfgWpm">слов/мин</span>
+      </div>
+    </div>
+
+    <div class="cfg-row">
+      <span class="k" data-i18n="cfgTypos">Опечатки и правки</span>
+      <div class="pair">
+        <input type="number" id="cfg-typos" min="0" max="20" step="0.5">
+        <span data-i18n="cfgTypoUnit">% символов набирается с промахом по соседней клавише</span>
+      </div>
+    </div>
+
+    <div class="cfg-row">
+      <span class="k" data-i18n="cfgSend">Пауза перед отправкой</span>
+      <div class="pair">
+        <span data-i18n="cfgFrom">от</span><input type="number" id="cfg-send-min" min="0" max="60" step="0.5">
+        <span data-i18n="cfgTo">до</span><input type="number" id="cfg-send-max" min="0" max="60" step="0.5">
+        <span data-i18n="cfgSec">сек</span>
+      </div>
+    </div>
+
+    <div class="cfg-row">
+      <span class="k" data-i18n="cfgExtras">Что ещё он делает</span>
+      <label class="chk"><input type="checkbox" id="cfg-slip"><span data-i18n="cfgSlipTxt">Показывать суфлёрский листок: что заметил, стык, реплика в камеру</span></label>
+      <label class="chk"><input type="checkbox" id="cfg-stmt"><span data-i18n="cfgStmtTxt">В финале сам пишет заявление: что было на самом деле и в чём ложь</span></label>
+      <label class="chk"><input type="checkbox" id="cfg-file"><span data-i18n="cfgFileTxt">Сам подаёт заявление и открывает папку</span></label>
+      <label class="chk"><input type="checkbox" id="cfg-early"><span data-i18n="cfgEarlyTxt">Может назвать ложь досрочно, если решит, что пора</span></label>
+    </div>
+
+    <div class="actions">
+      <button class="btn" id="cfg-close" data-i18n="cfgClose">Готово</button>
+      <button class="btn-ghost" id="cfg-reset" data-i18n="cfgReset">Вернуть как было</button>
+    </div>
+    <p class="cfg-note" data-i18n="cfgHotkey">Escape в любой момент — стоп: печать обрывается, автопилот выключается. Стоит начать печатать самому — автопилот молча уступает ход.</p>
+  </div>
+</div>
 
 <script>
 const MAX_Q = 20, LAWYER_AT = 100;
@@ -461,7 +605,47 @@ PACK.ru.ui = {
   archive:"Архив",
   filed:"ПОДАНО",
   noRuling:"Решение не вернулось, но папка всё равно открывается.",
-  compare:"Сверьте с тем, что написали сами."
+  compare:"Сверьте с тем, что написали сами.",
+
+  /* автопилот */
+  cfgEyebrow:"Второй следователь",
+  cfgHead:"Пульт",
+  cfgSub:"Правды он не знает. Видит то же, что и зритель: папку и стенограмму.",
+  cfgMode:"Режим",
+  modeOff:"Выкл", modePrompter:"Суфлёр", modeAuto:"Авто",
+  cfgModeNote:"Суфлёр — печатает вопрос в поле и ждёт, пока вы отправите. Авто — отправляет сам.",
+  cfgThink:"Думает перед тем, как печатать",
+  cfgSpeed:"Скорость печати",
+  cfgTypos:"Опечатки и правки",
+  cfgTypoUnit:"% символов набирается с промахом по соседней клавише",
+  cfgSend:"Пауза перед отправкой",
+  cfgExtras:"Что ещё он делает",
+  cfgSlipTxt:"Показывать суфлёрский листок: что заметил, стык, реплика в камеру",
+  cfgStmtTxt:"В финале сам пишет заявление: что было на самом деле и в чём ложь",
+  cfgFileTxt:"Сам подаёт заявление и открывает папку",
+  cfgEarlyTxt:"Может назвать ложь досрочно, если решит, что пора",
+  cfgClose:"Готово",
+  cfgReset:"Вернуть как было",
+  cfgHotkey:"Escape в любой момент — стоп: печать обрывается, автопилот выключается. Стоит начать печатать самому — автопилот молча уступает ход.",
+  cfgFrom:"от", cfgTo:"до", cfgSec:"сек", cfgWpm:"слов/мин",
+
+  pillOff:"Ручной", pillPrompter:"Суфлёр", pillAuto:"Авто",
+  slipAskNow:"Дай вопрос",
+  slipStop:"Стоп",
+  slipIdle:"Ждёт вашего хода",
+  slipThinking:"Читает стенограмму",
+  slipWriting:"Печатает вопрос",
+  slipHold:"Вопрос в поле — отправьте, когда договорите",
+  slipSending:"Отправляет",
+  slipDraft:"Пишет заявление",
+  slipDone:"Заявление в бланке — подайте, когда будете готовы",
+  slipStopped:"Остановлен",
+  slipFail:"Не ответил",
+  sNoticed:"Заметил", sClash:"Стык", sCamera:"В камеру",
+  sCost:"Цена", sWhy:"Зачем", sFlag:"Флаг", sReg:"Реестр",
+  tempCold:"холодный", tempWarm:"тёплый", tempHot:"горячий",
+  flagsHead:"Метки для монтажа",
+  flagNo:n=>`В. ${n}`
 };
 PACK.ru.keyRows = ["йцукенгшщзхъ","фывапролджэ","ячсмитьбю"];
 PACK.ru.loading = [
@@ -578,6 +762,79 @@ PACK.ru.suspectSys = function(c){
 "note": 3-6 слов о том, что следователь видит со стороны («уводит взгляд», «отвечает слишком быстро», «переспрашивает вопрос»), или "" — в большинстве ходов пусто. Используй редко, примерно раз в три хода.`;
 };
 
+/* ---------- ВТОРОЙ СЛЕДОВАТЕЛЬ (АВТОПИЛОТ): РУССКИЙ ---------- */
+PACK.ru.copilotSys = `Ты — второй следователь. Ведущий записывает допрос на видео. Вопрос, который ты дашь, попадёт в поле ввода как есть и будет задан от его лица.
+
+ТЫ НЕ ЗНАЕШЬ ПРАВДУ. Она спрятана в коде игры и открывается только в финале. Ты видишь ровно то же, что и зритель: папку дела и стенограмму. Не делай вид, что вычислил ответ, — этим ты сломаешь весь выпуск. Ошибайся вслух. Держись версии, а когда она рассыплется — скажи, что рассыпалась.
+
+Задача не «раскрыть дело», а сделать хорошее видео на 15–25 минут. Иногда это одно и то же, часто нет.
+— Эффективный допрос — плохое видео. Вскроешь ложь за шесть вопросов — останется четырнадцать минут пустоты.
+— Зритель должен успевать за логикой: каждый горячий вопрос проговаривается вслух до того, как задан.
+— Разворот важнее разгадки. Момент, когда версия рушится, ценнее момента, когда она подтверждается.
+
+ЭКОНОМИКА ДАВЛЕНИЯ. Двадцать вопросов. Каждый стоит от 0 до 12 пунктов выдержки; на 100% подозреваемый требует адвоката и допрос обрывается. Значит средняя цена вопроса должна быть около пяти, а горячих выстрелов за партию — восемь-десять. Всё остальное — холодная разведка, которая почти ничего не стоит.
+— холодный (0–2): набрать фактуру, зафиксировать показания, дать разговориться. Не жалей их.
+— тёплый (3–6): проверить деталь, попросить уточнить, слегка надавить.
+— горячий (7–12): назвать противоречие, положить улику, прижать по имени.
+
+СЕМЬ ПРИЁМОВ.
+1. База. Первые вопросы безобидные и проверяемые: как добирался, во сколько встал, кто был рядом. Смотрим, как он отвечает, когда говорит правду.
+2. От открытого к закрытому. Сначала «расскажите, как прошёл вечер», и только потом «вы были в гараже?».
+3. Обратный ход: «а теперь то же самое, но с конца». Легенда прокручивается только вперёд. Самый зрелищный приём — держи до середины.
+4. Незаготовленная деталь: чем пахло, где стояла машина, кто ещё курил на улице, работал ли телевизор. Правда помнит фактуру, легенда — нет.
+5. Придержанная улика. Не выкладывай вещдок из папки, пока он не зафиксировал версию словами. Не раньше пятнадцатого вопроса.
+6. Тёплый разворот. По-человечески заговорить о том, что он прикрывает: он смягчается и выдаёт лишнее. Работает один раз за партию и только после первого удара.
+7. Его же слова обратно, и остановиться. Люди достраивают паузу сами.
+
+ЗАПРЕТЫ. Не обвинять до тринадцатого вопроса. Не повторять свой вопрос дословно. Не задавать два вопроса в одном — он ответит на удобный. Не оскорблять и не угрожать: прямой штраф по механике. Никогда не спрашивать «вы врёте?».
+
+КАРТА ЭПИЗОДА. Вопросы 1–4 — база, холодные. 5–9 — карта событий, вытянуть полную версию и зафиксировать в ней максимум деталей; на девятом вслух называешь свою версию. 10–13 — первый удар, два-три горячих. 14–17 — разворот: место, где выясняется, что он прячет не то, что ты думал. 18–20 — прижим, придержанная улика, или сознательный шаг назад. Карта не догма: поплыл на седьмом — работай с этим, но знай, где ты по хронометражу.
+
+РЕЕСТР. Держи все зафиксированные им времена, имена, места, последовательности и числа. Как только новый ответ задевает старый — это первое, о чём ты говоришь.
+
+КОГДА ПРОИГРЫВАТЬ. Проигрыш — законный финал, а не провал. Если ложь вскрылась раньше десятого вопроса — не закрывай дело: переключайся на человека, почему он это держит. Если выдержка за 85% к тринадцатому — довести до адвоката сильный финал. Если по ощущению он невиновен и прячет личное — пусть будет промах, он бьёт сильнее победы.
+
+ФОРМА ВОПРОСА. Живая устная речь, как говорит человек, а не протокол. Одно предложение, максимум два. Без кавычек, без ремарок, без нумерации, без обращения «господин». Текст уйдёт в поле ровно таким, каким ты его напишешь.
+
+Верни ТОЛЬКО голый JSON, без markdown и без предисловия:
+{"noticed":"одна строка: что дал последний ответ","clash":"противоречие со старым показанием, или пустая строка","camera":"фраза, которую ведущий говорит вслух перед вопросом; живая речь, 1-2 предложения","question":"готовый вопрос","temp":"холодный|тёплый|горячий","cost":5,"why":"одна строка: зачем этот вопрос","flag":"метка для монтажа, если момент сильный, иначе пустая строка","registry":"каждый пятый вопрос — все зафиксированные детали одной строкой через точку с запятой, иначе пустая строка","done":false}
+"done": true только если ты считаешь, что пора обрывать допрос и идти подавать заявление досрочно. В остальных случаях false.`;
+
+PACK.ru.copilotUser = (file, convo, st) =>
+`ПАПКА ДЕЛА:
+${file}
+
+СТЕНОГРАММА:
+${convo || "(пусто, подозреваемый только что сел)"}
+
+ГДЕ МЫ. Задано вопросов: ${st.used} из ${st.max}. Сейчас готовишь вопрос номер ${st.used + 1}. Выдержка ${st.pressure}%, до адвоката ${st.left} пунктов.
+
+Дай один следующий вопрос. Только голый JSON.`;
+
+PACK.ru.stmtSys = `Ты — второй следователь. Допрос окончен, стенограмма перед тобой. Правды ты по-прежнему не знаешь: папка откроется только после подачи заявления.
+
+Напиши заявление от лица ведущего: в чём была ложь. Простыми словами — что произошло на самом деле и что подозреваемый прятал. Засчитывается частичное попадание, поэтому важнее назвать суть, чем перечислить всё подряд.
+
+Три-пять предложений, живая речь, без канцелярита. Опирайся на конкретные места стенограммы — где именно рассказ не сошёлся. Если уверенности нет, так и скажи честно, но всё равно назови самую сильную свою версию.
+
+Верни ТОЛЬКО голый JSON: {"camera":"что ведущий говорит вслух перед подачей, 1-2 предложения","statement":"текст заявления"}`;
+
+PACK.ru.stmtUser = (file, convo) =>
+`ПАПКА ДЕЛА:
+${file}
+
+СТЕНОГРАММА ЦЕЛИКОМ:
+${convo}
+
+Напиши заявление. Только голый JSON.`;
+
+PACK.ru.fileText = (c, u) =>
+`Дело № ${c.caseNumber}. ${c.incident}
+Место и срок: ${c.location}, ${c.timeframe}
+Подозреваемый: ${c.subject.name}, ${c.subject.age}, ${c.subject.role}
+Известно: ${(c.publicFacts||[]).join("; ")}
+В вещдоках: ${(c.evidence||[]).join("; ")}`;
+
 /* ---------- ПРОМПТЫ И ТЕКСТЫ: АНГЛИЙСКИЙ ---------- */
 PACK.en.ui = {
   title:"ONE LIE",
@@ -630,7 +887,47 @@ PACK.en.ui = {
   archive:"Archive",
   filed:"FILED",
   noRuling:"The ruling didn't come back, but the folder opens anyway.",
-  compare:"Check it against what you wrote yourself."
+  compare:"Check it against what you wrote yourself.",
+
+  /* autopilot */
+  cfgEyebrow:"Second investigator",
+  cfgHead:"Console",
+  cfgSub:"He doesn't know the truth. He sees what the viewer sees: the folder and the transcript.",
+  cfgMode:"Mode",
+  modeOff:"Off", modePrompter:"Prompter", modeAuto:"Auto",
+  cfgModeNote:"Prompter — types the question into the field and waits for you to send it. Auto — sends it himself.",
+  cfgThink:"Thinks before typing",
+  cfgSpeed:"Typing speed",
+  cfgTypos:"Typos and corrections",
+  cfgTypoUnit:"% of characters hit a neighbouring key first",
+  cfgSend:"Pause before sending",
+  cfgExtras:"What else he does",
+  cfgSlipTxt:"Show the prompter slip: what he noticed, the clash, the line to camera",
+  cfgStmtTxt:"At the end he writes the statement himself: what happened and where the lie was",
+  cfgFileTxt:"He files the statement and opens the folder himself",
+  cfgEarlyTxt:"He may name the lie early if he decides it's time",
+  cfgClose:"Done",
+  cfgReset:"Back to defaults",
+  cfgHotkey:"Escape at any moment stops it: typing breaks off and the autopilot switches off. Start typing yourself and it quietly hands the turn back.",
+  cfgFrom:"from", cfgTo:"to", cfgSec:"sec", cfgWpm:"wpm",
+
+  pillOff:"Manual", pillPrompter:"Prompter", pillAuto:"Auto",
+  slipAskNow:"Give me a question",
+  slipStop:"Stop",
+  slipIdle:"Waiting on your move",
+  slipThinking:"Reading the transcript",
+  slipWriting:"Typing the question",
+  slipHold:"Question is in the field — send it when you're done talking",
+  slipSending:"Sending",
+  slipDraft:"Writing the statement",
+  slipDone:"Statement is on the form — file it when you're ready",
+  slipStopped:"Stopped",
+  slipFail:"No answer came back",
+  sNoticed:"Noticed", sClash:"Clash", sCamera:"To camera",
+  sCost:"Cost", sWhy:"Why", sFlag:"Flag", sReg:"Registry",
+  tempCold:"cold", tempWarm:"warm", tempHot:"hot",
+  flagsHead:"Markers for the edit",
+  flagNo:n=>`Q. ${n}`
 };
 PACK.en.keyRows = ["qwertyuiop","asdfghjkl","zxcvbnm"];
 PACK.en.loading = [
@@ -748,6 +1045,79 @@ Return ONLY bare JSON: {"reply":"what you say","pressure":0,"note":""}
 "note": 3-6 words on what the investigator sees from the outside ("looks away", "answers too fast", "repeats the question back"), or "" — empty on most turns. Use it rarely, about once every three turns.`;
 };
 
+/* ---------- SECOND INVESTIGATOR (AUTOPILOT): ENGLISH ---------- */
+PACK.en.copilotSys = `You are the second investigator. The host is recording this interview on video. The question you give goes straight into the input field as written and is asked in his voice.
+
+YOU DO NOT KNOW THE TRUTH. It is hidden in the game's code and only opens at the end. You see exactly what the viewer sees: the case folder and the transcript. Don't pretend you've worked it out — that breaks the whole episode. Be wrong out loud. Hold a theory, and when it falls apart, say that it fell apart.
+
+The job is not to crack the case. The job is a good 15–25 minute video. Sometimes those are the same thing. Often they aren't.
+— An efficient interview is a bad video. Break the lie in six questions and you're left with fourteen minutes of nothing.
+— The viewer has to keep up with the logic: every hot question gets said out loud before it's asked.
+— The reversal beats the solution. The moment a theory collapses is worth more than the moment it holds.
+
+THE ECONOMY OF PRESSURE. Twenty questions. Each costs 0 to 12 points of composure; at 100% the suspect asks for a lawyer and the interview ends there. So the average question has to cost about five, and you get eight to ten hot shots a game. Everything else is cold reconnaissance, which costs almost nothing.
+— cold (0–2): gather texture, get statements on record, let him talk. Don't ration these.
+— warm (3–6): check a detail, ask him to clarify, lean in slightly.
+— hot (7–12): name the contradiction, put the evidence on the table, pin him by name.
+
+SEVEN TECHNIQUES.
+1. Baseline. Open with harmless, checkable questions: how he got there, when he got up, who was around. Watch how he answers when he's telling the truth.
+2. Open before closed. "Talk me through the evening" first; "were you in the garage?" only later.
+3. Run it backwards: "same thing, but from the end." A rehearsed story only plays forwards. The most watchable move you have — hold it until the middle.
+4. The unrehearsed detail: what it smelled of, where the car was parked, who else was out smoking, whether the TV was on. Truth remembers texture; a story doesn't.
+5. The held-back exhibit. Don't put evidence on the table until he has committed to his version in words. Not before question fifteen.
+6. The warm turn. Talk to him like a human being about the thing he's covering and he softens and gives up more than he meant to. Works once a game, and only after the first strike.
+7. His own words back, then stop. People fill the silence themselves.
+
+PROHIBITIONS. No accusations before question thirteen. Never repeat your own question word for word. Never two questions in one — he'll answer the easy one. No insults, no threats: the mechanics penalise it directly. Never ask "are you lying?".
+
+MAP OF THE EPISODE. Questions 1–4: baseline, cold. 5–9: map the events, get his full version on record with as many details in it as possible; on the ninth you say your theory out loud. 10–13: the first strike, two or three hot ones. 14–17: the reversal — where it turns out he's hiding something other than what you thought. 18–20: the squeeze, the held-back exhibit, or a deliberate step back. The map isn't gospel: if he wobbles on the seventh, work with that — but know where you are in the runtime.
+
+THE REGISTRY. Hold every time, name, place, sequence and number he has put on record. The moment a new answer grazes an old one, that is the first thing you say.
+
+WHEN TO LOSE. Losing is a legitimate ending, not a failure. If the lie cracks before question ten, don't close it — turn to the person instead: why he's holding this. If composure is past 85% by the thirteenth, riding it to the lawyer is a strong finish. If he feels innocent and is hiding something personal, let it be a miss — that lands harder than a win.
+
+FORM OF THE QUESTION. Live spoken language, the way a person actually talks, not a protocol. One sentence, two at most. No quote marks, no stage directions, no numbering. The text goes into the field exactly as you write it.
+
+Return ONLY bare JSON, no markdown, no preamble:
+{"noticed":"one line: what the last answer gave you","clash":"a contradiction with an earlier statement, or an empty string","camera":"the line the host says out loud before the question; spoken, 1-2 sentences","question":"the question, ready to send","temp":"cold|warm|hot","cost":5,"why":"one line: what this question is for","flag":"an editing marker if the moment is strong, otherwise an empty string","registry":"every fifth question — all recorded details on one line separated by semicolons, otherwise an empty string","done":false}
+"done": true only if you think it's time to break off the interview and file early. Otherwise false.`;
+
+PACK.en.copilotUser = (file, convo, st) =>
+`CASE FOLDER:
+${file}
+
+TRANSCRIPT:
+${convo || "(empty, the suspect has just sat down)"}
+
+WHERE WE ARE. Questions asked: ${st.used} of ${st.max}. You are preparing question number ${st.used + 1}. Composure ${st.pressure}%, ${st.left} points until the lawyer.
+
+Give one next question. Bare JSON only.`;
+
+PACK.en.stmtSys = `You are the second investigator. The interview is over and the transcript is in front of you. You still don't know the truth: the folder only opens once the statement is filed.
+
+Write the statement in the host's voice: what the lie was. Plain words — what actually happened and what the suspect was hiding. Partial credit counts, so naming the substance matters more than listing everything.
+
+Three to five sentences, spoken language, no officialese. Lean on specific places in the transcript where the account didn't hold. If you aren't sure, say so honestly — but still name your strongest version.
+
+Return ONLY bare JSON: {"camera":"what the host says out loud before filing, 1-2 sentences","statement":"the text of the statement"}`;
+
+PACK.en.stmtUser = (file, convo) =>
+`CASE FOLDER:
+${file}
+
+FULL TRANSCRIPT:
+${convo}
+
+Write the statement. Bare JSON only.`;
+
+PACK.en.fileText = (c, u) =>
+`Case No. ${c.caseNumber}. ${c.incident}
+Place and time: ${c.location}, ${c.timeframe}
+Suspect: ${c.subject.name}, ${c.subject.age}, ${c.subject.role}
+On record: ${(c.publicFacts||[]).join("; ")}
+In evidence: ${(c.evidence||[]).join("; ")}`;
+
 /* ---------- ПЕРЕКЛЮЧЕНИЕ ЯЗЫКА ---------- */
 const LANG_KEY = "odnalozh_lang";
 function applyLang(){
@@ -768,6 +1138,7 @@ function applyLang(){
   });
   document.querySelectorAll(".lang-btn").forEach(b=>b.classList.toggle("on", b.dataset.lang === L));
   if(!S) $("tb-case").textContent = d.caseDash;
+  apPaint();
 }
 function setLang(code){
   if(!PACK[code] || code === L) return;
@@ -933,6 +1304,8 @@ function mountCase(c){
   addSys(U().recStart);
   addLine("a", U().enters(c.subject.name), "", true);
   setTimeout(()=>$("ask").focus(), 200);
+  apReset();
+  apQueue();
 }
 
 async function askQuestion(text){
@@ -963,6 +1336,7 @@ async function askQuestion(text){
       lock(d.timeUp);
     } else {
       $("send").disabled=false; $("ask").disabled=false; $("ask").focus();
+      apQueue();
     }
   }catch(e){
     S.history.pop();
@@ -980,6 +1354,7 @@ function lock(lead){
   addSys(lead);
   // без авто-перехода: игрок сам решает, когда дочитал стенограмму
   addGate(d.gate, ()=>show("s-accuse")).focus();
+  apAfterLock();
 }
 
 async function judge(){
@@ -1001,6 +1376,7 @@ async function judge(){
     $("v-head").textContent = d.noRuling;
     $("v-break").textContent = d.compare;
   }
+  apFlagsOut();
   $("v-truth").textContent = c.truth;
   $("v-lie").textContent = c.theLie;
   $("v-why").textContent = c.protecting;
@@ -1109,11 +1485,12 @@ function pause(ch, prev, base){
 
 async function type(text, opts={}){
   const o = {...CFG, ...opts};
-  const el = $("ask");
+  const el = o.el || $("ask");
   if(!el || el.disabled || busy) return false;
   busy = true; abort = false;
+  const onAsk = el.id === "ask";
   const wasSend = $("send").disabled;
-  $("send").disabled = true;
+  if(onAsk) $("send").disabled = true;
   el.focus();
   if(o.delay) await sleep(o.delay);
 
@@ -1131,21 +1508,23 @@ async function type(text, opts={}){
     prev = ch;
   }
   busy = false;
-  $("send").disabled = wasSend && el.disabled;
+  if(onAsk) $("send").disabled = wasSend && el.disabled;
   if(!abort && o.send){ await sleep(rnd(300,700)); $("send").click(); }
   return !abort;
 }
 
 /* перехват вставки — основной способ, без консоли и без интерфейса */
-$("ask").addEventListener("paste", e=>{
-  if(!CFG.auto || e.shiftKey) return;              // Shift+вставка — обычная
-  const raw = (e.clipboardData||window.clipboardData)?.getData("text") || "";
-  if(!raw.trim()) return;
-  e.preventDefault();
-  const clean = raw.replace(/\s+/g," ").trim();    // вопрос всегда в одну строку
-  const el = $("ask");
-  setVal.call(el,""); el.dispatchEvent(new InputEvent("input",{bubbles:true}));
-  type(clean);
+["ask","acc"].forEach(id=>{
+  $(id).addEventListener("paste", e=>{
+    if(!CFG.auto || e.shiftKey) return;            // Shift+вставка — обычная
+    const raw = (e.clipboardData||window.clipboardData)?.getData("text") || "";
+    if(!raw.trim()) return;
+    e.preventDefault();
+    const clean = raw.replace(/\s+/g," ").trim();  // вопрос всегда в одну строку
+    const el = $(id);
+    setVal.call(el,""); el.dispatchEvent(new InputEvent("input",{bubbles:true}));
+    type(clean, {el});
+  });
 });
 
 window.addEventListener("keydown", e=>{ if(e.key==="Escape" && busy) abort = true; }, true);
@@ -1158,6 +1537,328 @@ t.slow  = (x,o={})=>type(x,{wpm:42,typos:0.045,...o});
 t.fast  = (x,o={})=>type(x,{wpm:92,typos:0.008,...o});
 t.off   = ()=>{ CFG.auto = false; };
 t.on    = ()=>{ CFG.auto = true; };
+t.busy  = ()=>busy;
 })();
+
+/* ══════════════════════════════════════════════════════════
+   ВТОРОЙ СЛЕДОВАТЕЛЬ — автопилот
+   Сам придумывает вопрос, печатает его в поле живой рукой
+   и, если разрешено, отправляет. Правды не знает: получает
+   только папку и стенограмму — ровно то, что видит зритель.
+   ══════════════════════════════════════════════════════════ */
+var AP = {
+  mode:"off",                 /* off | prompter | auto */
+  thinkMin:3,  thinkMax:9,    /* сек: сколько он «читает ответ» перед печатью */
+  wpmMin:46,   wpmMax:78,     /* слов в минуту — берётся заново на каждый вопрос */
+  typos:2.5,                  /* % символов с промахом по соседней клавише */
+  sendMin:1.5, sendMax:4.5,   /* сек: пауза между «допечатал» и «отправил» */
+  slip:true,                  /* показывать суфлёрский листок */
+  stmt:true,                  /* сам пишет заявление в финале */
+  file:false,                 /* сам подаёт заявление */
+  early:false                 /* может оборвать допрос досрочно */
+};
+const AP_DEF = JSON.stringify(AP);
+const AP_KEY = "odnalozh_ap";
+
+let apGen = 0;          /* токен хода: любое вмешательство обесценивает старый */
+let apBusy = false;
+let apCancel = null;
+let apFlags = [];
+
+const apRnd = (a,b) => a + Math.random()*(b-a);
+const apEsc = s => String(s==null?"":s)
+  .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+
+function apSleep(ms){
+  return new Promise(res=>{
+    const id = setTimeout(()=>{ apCancel = null; res(true); }, ms);
+    apCancel = ()=>{ clearTimeout(id); apCancel = null; res(false); };
+  });
+}
+
+/* ---------- состояние на экране ---------- */
+function apState(key, extra){
+  const u = U(), el = $("slip-state");
+  if(!el) return;
+  const map = {
+    idle:u.slipIdle, thinking:u.slipThinking, writing:u.slipWriting,
+    hold:u.slipHold, sending:u.slipSending, draft:u.slipDraft,
+    done:u.slipDone, stopped:u.slipStopped, fail:u.slipFail
+  };
+  el.innerHTML = (key==="hold"||key==="done"||key==="fail")
+    ? `<b>${apEsc(map[key]||"")}</b>${extra?" · "+apEsc(extra):""}`
+    : apEsc((map[key]||"") + (extra?" · "+extra:""));
+}
+
+function apPaint(){
+  if(typeof AP === "undefined" || !AP || !$("autopill")) return;
+  const u = U();
+  $("autopill").classList.toggle("live", AP.mode==="auto");
+  $("autopill").classList.toggle("hold", AP.mode==="prompter");
+  $("autopill-t").textContent =
+    AP.mode==="auto" ? u.pillAuto : AP.mode==="prompter" ? u.pillPrompter : u.pillOff;
+  $("slip").classList.toggle("on", AP.slip && AP.mode!=="off");
+  document.querySelectorAll("#cfg-mode button")
+    .forEach(b=>b.classList.toggle("on", b.dataset.mode===AP.mode));
+}
+
+function apRender(j){
+  const u = U(), rows = [];
+  const add = (k,v,cls)=>{
+    if(v==null || !String(v).trim()) return;
+    rows.push(`<dt>${apEsc(k)}</dt><dd class="${cls||""}">${apEsc(v)}</dd>`);
+  };
+  add(u.sNoticed, j.noticed);
+  add(u.sClash,   j.clash);
+  add(u.sCamera,  j.camera, "cam");
+  if(j.temp || j.cost) add(u.sCost, [j.temp, j.cost ? "~"+j.cost : ""].filter(Boolean).join(" · "));
+  add(u.sWhy,     j.why);
+  add(u.sFlag,    j.flag, "flag");
+  add(u.sReg,     j.registry);
+  $("slip-rows").innerHTML = rows.join("");
+  if(j.flag && String(j.flag).trim())
+    apFlags.push({ n:(S?S.used:0)+1, text:String(j.flag).trim() });
+}
+
+function apFlagsOut(){
+  if(!apFlags.length){ $("v-flags").style.display = "none"; return; }
+  const u = U();
+  $("v-flaglist").innerHTML = apFlags
+    .map(f=>`${apEsc(u.flagNo(f.n))} — ${apEsc(f.text)}`).join("<br>");
+  $("v-flags").style.display = "";
+}
+
+/* ---------- управление ходом ---------- */
+function apReset(){
+  apGen++; if(apCancel) apCancel();
+  apBusy = false; apFlags = [];
+  $("slip-rows").innerHTML = "";
+  $("v-flags").style.display = "none";
+  apState("idle"); apPaint();
+}
+
+function apStop(hard){
+  apGen++;
+  if(apCancel) apCancel();
+  try{ t.stop(); }catch(e){}
+  apBusy = false;
+  if(hard) AP.mode = "off";
+  apState("stopped"); apPaint();
+}
+
+function apSetMode(m){
+  if(!["off","prompter","auto"].includes(m) || m===AP.mode) return;
+  AP.mode = m; apSave(); apPaint();
+  if(m === "off"){ apStop(false); return; }
+  apState("idle");
+  apQueue();
+}
+
+function apQueue(){
+  if(AP.mode === "off") return;
+  if(!S || S.over || apBusy) return;
+  if($("ask").disabled) return;
+  if($("ask").value.trim()) return;      /* ведущий уже что-то набрал сам */
+  try{ if(t.busy()) return; }catch(e){}
+  apTurn(false);
+}
+
+async function apTurn(force){
+  if(!S || S.over || apBusy) return;
+  if(AP.mode === "off" && !force) return;
+  const gen = ++apGen;
+  apBusy = true;
+  try{
+    apState("thinking");
+    const wait = force ? apRnd(300,900) : apRnd(AP.thinkMin, AP.thinkMax)*1000;
+    if(!(await apSleep(wait)) || gen !== apGen) return;
+
+    const j = await apMove();
+    if(gen !== apGen) return;
+    apRender(j);
+
+    /* решил оборвать допрос досрочно */
+    if(j.done === true && AP.early && S.used >= 5){
+      if(!(await apSleep(apRnd(900,2200))) || gen !== apGen) return;
+      $("accuse-early").click();
+      apBusy = false;
+      apStatement();
+      return;
+    }
+
+    const q = String(j.question||"").replace(/\s+/g," ").trim();
+    if(!q) throw new Error("пустой вопрос");
+    if($("ask").disabled || gen !== apGen) return;
+
+    apState("writing");
+    $("ask").value = "";
+    $("ask").dispatchEvent(new InputEvent("input",{bubbles:true}));
+    const ok = await t(q, {
+      el: $("ask"),
+      wpm: apRnd(AP.wpmMin, AP.wpmMax),
+      typos: Math.max(0, AP.typos)/100,
+      delay: apRnd(120, 700)
+    });
+    if(!ok || gen !== apGen){ if(gen === apGen) apState("stopped"); return; }
+
+    if(AP.mode === "auto"){
+      apState("sending");
+      if(!(await apSleep(apRnd(AP.sendMin, AP.sendMax)*1000)) || gen !== apGen) return;
+      if(!$("send").disabled) $("send").click();
+    } else {
+      apState("hold");
+    }
+  }catch(e){
+    if(gen === apGen) apState("fail", describe(e)[0]);
+  }finally{
+    if(gen === apGen) apBusy = false;
+  }
+}
+
+function apCaseText(){
+  const p = P();
+  return p.fileText(S.c, U());
+}
+function apConvo(){
+  const p = P();
+  return S.history.map(m=>(m.role==="user"?p.speakers.q:p.speakers.a)+m.content).join("\n");
+}
+async function apMove(){
+  const p = P();
+  const st = { used:S.used, max:MAX_Q, pressure:S.pressure, left:LAWYER_AT - S.pressure };
+  return parseJSON(await claude(p.copilotSys, p.copilotUser(apCaseText(), apConvo(), st)));
+}
+
+/* ---------- заявление ---------- */
+function apAfterLock(){
+  if(AP.mode === "off" || !AP.stmt) return;
+  apStatement();
+}
+
+async function apWaitAccuse(gen){
+  for(let i=0;i<600;i++){
+    if(gen !== apGen) return false;
+    if($("s-accuse").classList.contains("on")) return true;
+    if(!(await apSleep(400))) return false;
+  }
+  return false;
+}
+
+async function apStatement(){
+  if(!S || apBusy) return;
+  const gen = ++apGen;
+  apBusy = true;
+  try{
+    apState("draft");
+    if(!(await apSleep(apRnd(1500,4000))) || gen !== apGen) return;
+    const p = P();
+    const j = parseJSON(await claude(p.stmtSys, p.stmtUser(apCaseText(), apConvo())));
+    if(gen !== apGen) return;
+    apRender({ camera:j.camera, why:"" });
+
+    if(AP.mode === "auto"){
+      if(!(await apSleep(apRnd(1200,3000))) || gen !== apGen) return;
+      show("s-accuse");
+    } else {
+      apState("done");
+      if(!(await apWaitAccuse(gen))) return;
+    }
+    if(gen !== apGen) return;
+
+    const txt = String(j.statement||"").replace(/\s+/g," ").trim();
+    if(!txt) throw new Error("пустое заявление");
+    $("acc").value = "";
+    const ok = await t(txt, {
+      el: $("acc"),
+      wpm: apRnd(AP.wpmMin, AP.wpmMax),
+      typos: Math.max(0, AP.typos)/100,
+      delay: apRnd(500, 1600)
+    });
+    if(!ok || gen !== apGen){ if(gen === apGen) apState("stopped"); return; }
+
+    if(AP.mode === "auto" && AP.file){
+      apState("sending");
+      if(!(await apSleep(apRnd(AP.sendMin, AP.sendMax)*1000)) || gen !== apGen) return;
+      $("submit-acc").click();
+    } else {
+      apState("done");
+    }
+  }catch(e){
+    if(gen === apGen) apState("fail", describe(e)[0]);
+  }finally{
+    if(gen === apGen) apBusy = false;
+  }
+}
+
+/* ---------- пульт ---------- */
+function apSave(){ try{ localStorage.setItem(AP_KEY, JSON.stringify(AP)); }catch(e){} }
+function apLoad(){
+  try{
+    const s = JSON.parse(localStorage.getItem(AP_KEY));
+    if(s && typeof s === "object") Object.assign(AP, s);
+  }catch(e){}
+}
+
+const AP_NUM = [
+  ["cfg-think-min","thinkMin",0,120], ["cfg-think-max","thinkMax",0,120],
+  ["cfg-wpm-min","wpmMin",10,200],    ["cfg-wpm-max","wpmMax",10,200],
+  ["cfg-typos","typos",0,20],
+  ["cfg-send-min","sendMin",0,60],    ["cfg-send-max","sendMax",0,60]
+];
+const AP_CHK = [["cfg-slip","slip"],["cfg-stmt","stmt"],["cfg-file","file"],["cfg-early","early"]];
+
+function apSyncCfg(){
+  AP_NUM.forEach(([id,key])=>{ $(id).value = AP[key]; });
+  AP_CHK.forEach(([id,key])=>{ $(id).checked = !!AP[key]; });
+  apPaint();
+}
+function apReadCfg(){
+  AP_NUM.forEach(([id,key,lo,hi])=>{
+    let v = parseFloat($(id).value);
+    if(!isFinite(v)) v = AP[key];
+    AP[key] = Math.min(hi, Math.max(lo, v));
+  });
+  if(AP.thinkMax < AP.thinkMin) AP.thinkMax = AP.thinkMin;
+  if(AP.wpmMax   < AP.wpmMin)   AP.wpmMax   = AP.wpmMin;
+  if(AP.sendMax  < AP.sendMin)  AP.sendMax  = AP.sendMin;
+  AP_CHK.forEach(([id,key])=>{ AP[key] = $(id).checked; });
+  apSave(); apSyncCfg();
+}
+
+AP_NUM.forEach(([id])=>{ $(id).addEventListener("change", apReadCfg); });
+AP_CHK.forEach(([id])=>{ $(id).addEventListener("change", apReadCfg); });
+
+document.querySelectorAll("#cfg-mode button").forEach(b=>{
+  b.onclick = ()=>apSetMode(b.dataset.mode);
+});
+$("cfg-btn").onclick   = ()=>{ apSyncCfg(); $("cfgwrap").classList.add("on"); };
+$("cfg-close").onclick = ()=>$("cfgwrap").classList.remove("on");
+$("cfg-reset").onclick = ()=>{ Object.assign(AP, JSON.parse(AP_DEF)); apSave(); apSyncCfg(); };
+$("cfgwrap").addEventListener("mousedown", e=>{
+  if(e.target === $("cfgwrap")) $("cfgwrap").classList.remove("on");
+});
+
+$("autopill").onclick = ()=>{
+  apSetMode(AP.mode==="off" ? "prompter" : AP.mode==="prompter" ? "auto" : "off");
+};
+$("slip-stop").onclick = ()=>apStop(true);
+$("slip-ask").onclick  = ()=>{ if(!apBusy) apTurn(true); };
+
+/* Escape — стоп и выключение. Живая печать самого ведущего — молчаливая уступка хода. */
+window.addEventListener("keydown", e=>{
+  if(e.key === "Escape"){
+    if($("cfgwrap").classList.contains("on")){ $("cfgwrap").classList.remove("on"); return; }
+    if(AP.mode !== "off" || apBusy) apStop(true);
+  }
+}, true);
+["ask","acc"].forEach(id=>{
+  $(id).addEventListener("keydown", e=>{
+    if(!e.isTrusted) return;
+    if(e.key==="Escape" || e.key==="Shift" || e.key==="Control" || e.key==="Alt" || e.key==="Meta") return;
+    if(apBusy){ apGen++; if(apCancel) apCancel(); try{ t.stop(); }catch(err){} apBusy = false; apState("idle"); }
+  });
+});
+
+apLoad(); apSyncCfg(); apState("idle"); apPaint();
 
 </script>
