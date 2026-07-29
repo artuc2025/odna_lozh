@@ -95,6 +95,57 @@ button{font:inherit; cursor:pointer; border:none; background:none; color:inherit
 .gauge i.lit{background:var(--stamp)}
 .gauge span{margin-left:7px; opacity:.65; font-family:var(--mono); letter-spacing:0}
 
+/* ШКАЛА ВЫДЕРЖКИ — лента самописца под шапкой */
+.pscale{
+  position:relative; flex-shrink:0; height:36px; overflow:hidden;
+  background:var(--carbon); border-top:1px solid rgba(227,220,198,.13);
+  display:flex; align-items:center; gap:13px; padding:0 20px;
+  font-family:var(--disp); font-size:11px; letter-spacing:.16em; text-transform:uppercase;
+  color:rgba(227,220,198,.5);
+}
+.pscale-fill{
+  position:absolute; left:0; top:0; bottom:0; width:0;
+  background:var(--stamp); pointer-events:none;
+  transition:width .55s cubic-bezier(.22,.68,.24,1);
+}
+/* перо: светлая черта на переднем крае заливки */
+.pscale-fill::after{
+  content:""; position:absolute; right:0; top:0; bottom:0;
+  width:2px; background:var(--file);
+}
+.pscale-ticks{
+  position:absolute; inset:0; pointer-events:none;
+  background:repeating-linear-gradient(90deg,
+    rgba(227,220,198,.26) 0 1px, transparent 1px 10%);
+}
+.pscale > span{position:relative}
+.pscale-num{
+  font-size:19px; font-weight:600; letter-spacing:.03em;
+  color:var(--file); min-width:56px;
+}
+.pscale-left{margin-left:auto; color:rgba(227,220,198,.66)}
+.pscale-hit{
+  position:absolute; top:50%; transform:translateY(-50%);
+  font-family:var(--disp); font-size:15px; font-weight:600;
+  color:var(--file); opacity:0; white-space:nowrap; pointer-events:none;
+}
+.pscale-hit.go{animation:hit 1.6s ease-out forwards}
+@keyframes hit{
+  0%{opacity:0}
+  12%{opacity:1}
+  72%{opacity:1}
+  100%{opacity:0}
+}
+.pscale.warn .pscale-num{animation:pulse 1.25s ease-in-out infinite}
+.pscale.crit .pscale-num{animation:pulse .7s ease-in-out infinite}
+.pscale.crit .pscale-left{color:var(--file)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@media (prefers-reduced-motion: reduce){
+  .pscale-fill{transition:none}
+  .pscale-hit.go{animation-duration:.01s}
+  .pscale.warn .pscale-num,.pscale.crit .pscale-num{animation:none}
+}
+
 .board{display:flex; flex:1; min-height:0}
 
 /* ПАПКА */
@@ -355,9 +406,15 @@ button{font:inherit; cursor:pointer; border:none; background:none; color:inherit
     <span id="tb-name">—</span>
     <span class="grow"></span>
     <span id="tb-q">Вопрос 0 / 20</span>
-    <span class="sep">/</span>
-    <span style="opacity:.6" data-i18n="composure">Выдержка</span>
-    <span class="gauge" id="gauge"></span>
+  </div>
+
+  <div class="pscale" id="pscale">
+    <div class="pscale-fill" id="pscale-fill"></div>
+    <div class="pscale-ticks"></div>
+    <span class="pscale-num" id="pscale-num">0%</span>
+    <span data-i18n="composure">Выдержка</span>
+    <span class="pscale-left" id="pscale-left">—</span>
+    <span class="pscale-hit" id="pscale-hit"></span>
   </div>
 
   <div class="board">
@@ -612,6 +669,7 @@ PACK.ru.ui = {
   how5:"В конце вы называете ложь. После этого папка открывается.",
   openCase:"Открыть дело",
   composure:"Выдержка",
+  toLawyer:n=>`До адвоката ${n}`,
   fileHead:"Материалы дела",
   subjectHead:"Подозреваемый",
   knownHead:"Известно",
@@ -732,12 +790,26 @@ PACK.ru.seeds = {
     "боится депортации родственника","взял чужую вину много лет назад","прячет долг перед своими же",
     "был там, где ему по запрету находиться нельзя"
   ],
+  SHAPES:[
+    "виновен и знает это — держит одну деталь, на которой всё сходится",
+    "невиновен в инциденте, но лжёт о том, где был и с кем",
+    "прикрывает другого человека и готов принять вину на себя",
+    "видел, кто это сделал, но молчит — боится за себя или за своих",
+    "правда стыдная, а не преступная: признание ничего не меняет в деле, но унижает его",
+    "виновен по недосмотру, а не по умыслу — и в панике, что это выглядит как умысел",
+    "сам пострадавшая сторона и это скрывает: его подставили, надавили, избили",
+    "лжёт из лояльности к коллективу — так делают все, он не считает это ложью",
+    "искренне уверен, что говорит правду, но память его подводит — ошибка, а не умысел",
+    "сразу признаётся в мелком нарушении, чтобы закрыть разговор о крупном",
+    "догадывается, что инцидент подстроен третьим лицом, но доказать не может и боится сказать вслух"
+  ],
   ROLES:["исполнитель","свидетель","начальник смены","родственник пострадавшего","сменщик","посторонний на территории","подрядчик","проверяющий"],
   DIFF:["лёгкая","средняя","средняя","трудная"]
 };
 PACK.ru.seedLine = s =>
   `Декорация на этот раз: ${s.set}. Тип инцидента: ${s.kind}. `
-  + `Подозреваемый по роли — ${s.role}. Мотив лжи: ${s.motive}. Сложность: ${s.diff}.`;
+  + `Подозреваемый по роли — ${s.role}. Мотив лжи: ${s.motive}. `
+  + `КОНСТРУКЦИЯ ДЕЛА: ${s.shape}. Сложность: ${s.diff}.`;
 PACK.ru.avoidLine = past =>
   `\n\nЭти дела уже были в эфире. Не повторяй ни имена, ни места, ни сюжеты:\n${past.map(s=>"— "+s).join("\n")}`;
 PACK.ru.caseUser = body => `${body}\n\nПридумай одно дело прямо сейчас. Конкретное и незатёртое.`;
@@ -773,9 +845,13 @@ PACK.ru.caseSys = `Ты придумываешь дела для игры-доп
 3. ДЕЛО. Мотив лжи каждый раз новый. Не сводить всё к роману на стороне и к деньгам — это два самых затёртых. Бери реже используемое: скрывает диагноз, был на похоронах, которые от семьи скрыл, подделал стаж, спит на смене, боится потерять опеку над ребёнком, покрывает подростка, стыдится безграмотности, нелегально подрабатывает, прячет, что его самого избили, срывает лечение зависимости, дал ложные показания за услугу, боится депортации родственника.
 4. РОЛЬ. Подозреваемый не обязан быть исполнителем. Пусть будет свидетель, начальник, родственник, сменщик, посторонний, подрядчик, проверяющий.
 
-Примерно в половине случаев подозреваемый НЕВИНОВЕН в самом инциденте, но всё равно лжёт. Это лучший вариант. Используй его часто.
+5. КОНСТРУКЦИЯ. В подсказке задана конструкция дела — это самое важное поле. Она решает, чем допрос закончится и какое чувство останется у зрителя: поймал виновного, дожал невиновного, вскрыл чужую тайну, зря давил на человека. Строй дело от неё, а не от инцидента.
 
-Ложь обязана быть находимой: должна существовать конкретная деталь, которая при прямом вопросе не сходится с остальным рассказом.
+ЧЕГО НЕ ДЕЛАТЬ С КОНСТРУКЦИЕЙ. Не сворачивай её обратно к схеме «скрыл нарушение, потому что был кому-то должен» — это самая затёртая развязка, и она уже была в эфире. Если конструкция говорит, что подозреваемый невиновен, — он невиновен по-настоящему, и поле truth это прямо подтверждает. Если конструкция говорит, что он прикрывает другого, — этот другой обязан быть конкретным человеком с именем и связью, а не абстракцией. Если правда стыдная — она должна быть по-настоящему неловкой и при этом совершенно ненаказуемой.
+
+ЛОЖЬ ПРИ ЛЮБОЙ КОНСТРУКЦИИ обязана быть находимой: существует конкретная деталь, которая при прямом вопросе не сходится с остальным рассказом. Даже когда человек не врёт злонамеренно — версия обязана где-то не сойтись.
+
+ЦЕНА. Меняй её от дела к делу: иногда последствия уже необратимы, иногда ещё можно кого-то спасти, иногда пострадало только имущество. Не делай каждый инцидент смертельным.
 
 СЛОЖНОСТЬ задаётся отдельно и меняет только ОДНО — насколько глубоко закопана эта деталь:
 - «лёгкая»: противоречие торчит прямо в publicFacts или evidence. Одного точного вопроса хватает.
@@ -906,6 +982,7 @@ PACK.en.ui = {
   how5:"At the end you name the lie. Then the folder opens.",
   openCase:"Open the case",
   composure:"Composure",
+  toLawyer:n=>`Lawyer in ${n}`,
   fileHead:"Case file",
   subjectHead:"Suspect",
   knownHead:"On record",
@@ -1028,12 +1105,26 @@ PACK.en.seeds = {
     "took someone else's blame years ago","hiding a debt to their own people",
     "was somewhere they are barred from being"
   ],
+  SHAPES:[
+    "guilty and knows it — holding one detail that makes the whole thing add up",
+    "innocent of the incident, but lying about where they were and who with",
+    "covering for another person and willing to take the blame",
+    "saw who did it but stays quiet — afraid for themselves or their people",
+    "the truth is shameful, not criminal: admitting it changes nothing in the case but humiliates them",
+    "guilty through negligence, not intent — and terrified it looks like intent",
+    "they are the injured party and hide it: set up, leaned on, beaten",
+    "lying out of loyalty to the crew — everyone does it, they don't count it as lying",
+    "sincerely believes they are telling the truth, but their memory is wrong — a mistake, not intent",
+    "confesses to a small breach straight away to close down talk of the big one",
+    "suspects the incident was staged by a third party, cannot prove it and is afraid to say it out loud"
+  ],
   ROLES:["the operator","a witness","shift supervisor","relative of the injured person","the other shift's worker","an outsider on site","a contractor","an inspector"],
   DIFF:["easy","medium","medium","hard"]
 };
 PACK.en.seedLine = s =>
   `Setting this time: ${s.set}. Type of incident: ${s.kind}. `
-  + `The suspect's role — ${s.role}. Motive for lying: ${s.motive}. Difficulty: ${s.diff}.`;
+  + `The suspect's role — ${s.role}. Motive for lying: ${s.motive}. `
+  + `SHAPE OF THE CASE: ${s.shape}. Difficulty: ${s.diff}.`;
 PACK.en.avoidLine = past =>
   `\n\nThese cases have already aired. Do not repeat the names, the places or the storylines:\n${past.map(s=>"— "+s).join("\n")}`;
 PACK.en.caseUser = body => `${body}\n\nInvent one case right now. Specific and not worn out.`;
@@ -1069,9 +1160,13 @@ THE MAIN REQUIREMENT IS NON-REPETITION. These cases run one after another and th
 3. THE CASE. A new motive for the lie every time. Don't reduce everything to an affair or to money — those two are the most worn out. Use the rarer ones: hiding a diagnosis, was at a funeral they hid from the family, faked their record, sleeping on shift, afraid of losing custody of a child, covering for a teenager, ashamed of being barely literate, working off the books, hiding that they were beaten up, falling off treatment for an addiction, gave false testimony as a favour, afraid a relative will be deported.
 4. THE ROLE. The suspect doesn't have to be the one who did it. Let them be a witness, a supervisor, a relative, the other shift's worker, an outsider, a contractor, an inspector.
 
-In roughly half the cases the suspect is INNOCENT of the incident itself but lies anyway. That is the best version. Use it often.
+5. THE SHAPE. The prompt sets a shape for the case — that is the most important field. It decides how the interview ends and what the viewer is left feeling: caught the guilty one, broke an innocent one, opened up somebody else's secret, leaned on a person for nothing. Build the case out from the shape, not out from the incident.
 
-The lie must be findable: there has to be one concrete detail that, put to them directly, doesn't line up with the rest of their account.
+WHAT NOT TO DO WITH THE SHAPE. Do not fold it back into "covered up a fault because they owed somebody" — that is the most worn-out ending and it has already aired. If the shape says the suspect is innocent, they are genuinely innocent and the truth field says so outright. If the shape says they are covering for someone, that someone is a specific person with a name and a connection, not an abstraction. If the truth is shameful, it has to be genuinely awkward and completely unpunishable.
+
+WHATEVER THE SHAPE, the lie must be findable: there is one concrete detail that, put to them directly, doesn't line up with the rest of their account. Even when the person isn't lying deliberately, the account has to fail somewhere.
+
+THE STAKES vary case to case: sometimes the damage is already irreversible, sometimes someone can still be saved, sometimes only property was hurt. Don't make every incident fatal.
 
 DIFFICULTY is set separately and changes only ONE thing — how deep that detail is buried:
 - "easy": the contradiction sits right there in publicFacts or evidence. One precise question is enough.
@@ -1208,6 +1303,7 @@ function applyLang(){
   });
   document.querySelectorAll(".lang-btn").forEach(b=>b.classList.toggle("on", b.dataset.lang === L));
   if(!S) $("tb-case").textContent = d.caseDash;
+  if(S) drawGauge();
   apPaint();
   if($("logwrap").classList.contains("on")) logPaint();
 }
@@ -1395,10 +1491,21 @@ function logText(){
 function logOpen(){ logPaint(); $("logwrap").classList.add("on"); }
 function logClose(){ $("logwrap").classList.remove("on"); }
 
-function drawGauge(){
+function drawGauge(delta){
   const p = Math.min(S.pressure, LAWYER_AT);
-  const filled = Math.round(p/LAWYER_AT*10);
-  $("gauge").innerHTML = Array.from({length:10},(_,i)=>`<i class="${i<filled?"lit":""}"></i>`).join("")+`<span>${p}%</span>`;
+  const pct = p / LAWYER_AT * 100;
+  $("pscale-fill").style.width = pct + "%";
+  $("pscale-num").textContent = p + "%";
+  $("pscale-left").textContent = U().toLawyer(LAWYER_AT - p);
+  const box = $("pscale");
+  box.classList.toggle("warn", p >= 70 && p < 88);
+  box.classList.toggle("crit", p >= 88);
+  if(delta > 0){
+    const hit = $("pscale-hit");
+    hit.textContent = "+" + delta;
+    hit.style.left = `calc(${Math.min(pct, 90)}% + 11px)`;
+    hit.classList.remove("go"); void hit.offsetWidth; hit.classList.add("go");
+  }
   $("tb-q").textContent = U().qcount(S.used, MAX_Q);
 }
 function showErr(msg, retryFn){
@@ -1454,6 +1561,7 @@ async function newCase(){
       kind:  pick(sd.KINDS),
       role:  pick(sd.ROLES),
       motive:pick(sd.MOTIVES),
+      shape: pick(sd.SHAPES),
       diff:  pick(sd.DIFF)
     });
     const c = parseJSON(await claude(p.caseSys, p.caseUser(seed + avoid)));
@@ -1517,7 +1625,7 @@ async function askQuestion(text){
     S.used++;
     const delta = Number(r.pressure)||0;
     S.pressure = Math.min(LAWYER_AT, S.pressure + delta);
-    drawGauge();
+    drawGauge(delta);
     logAdd("a", { text:r.reply, note:(r.note||"").trim(), delta, total:S.pressure });
     await addLine("a", r.reply, (r.note||"").trim());
 
