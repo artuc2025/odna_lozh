@@ -177,6 +177,25 @@ button{font:inherit; cursor:pointer; border:none; background:none; color:inherit
 .truth-block p:last-child{margin:0}
 .actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:22px}
 
+/* ВЫБОР ЯЗЫКА — графа в бланке дела */
+.langpick{
+  display:flex; align-items:center; justify-content:center; gap:0;
+  margin:0 auto 22px; width:fit-content;
+  border:1px solid var(--steel); background:rgba(227,220,198,.5);
+}
+.langpick .lp-label{
+  font-family:var(--disp); font-size:10px; letter-spacing:.2em; text-transform:uppercase;
+  color:var(--ink); padding:0 13px; border-right:1px solid var(--steel); align-self:stretch;
+  display:flex; align-items:center;
+}
+.lang-btn{
+  font-family:var(--disp); font-size:12px; font-weight:600; letter-spacing:.12em;
+  text-transform:uppercase; padding:9px 18px; color:var(--ink);
+  transition:background .15s, color .15s;
+}
+.lang-btn:hover{color:var(--carbon)}
+.lang-btn.on{background:var(--carbon); color:var(--file)}
+
 .errbox{
   max-width:730px; margin:12px auto 0; border:1px solid var(--stamp);
   background:var(--stamp-soft); padding:11px 14px; font-size:13px;
@@ -201,19 +220,24 @@ button{font:inherit; cursor:pointer; border:none; background:none; color:inherit
 <!-- ЗАСТАВКА -->
 <section class="screen on" id="s-title">
   <div class="title-card">
-    <h1 class="wordmark">Одна<em>Ложь</em></h1>
-    <p class="tagline">Двадцать вопросов. Один подозреваемый. Одна ложь, которую он так просто не отдаст.</p>
+    <h1 class="wordmark" data-i18n-html="wordmark">Одна<em>Ложь</em></h1>
+    <p class="tagline" data-i18n="tagline">Двадцать вопросов. Один подозреваемый. Одна ложь, которую он так просто не отдаст.</p>
     <div class="premise">
-      <div class="eyebrow" style="margin-bottom:10px">Как это устроено</div>
+      <div class="eyebrow" style="margin-bottom:10px" data-i18n="howHead">Как это устроено</div>
       <ul>
-        <li>Каждый запуск — новое дело. Ничего не повторяется.</li>
-        <li>У вас двадцать вопросов. Спрашивайте что угодно, своими словами.</li>
-        <li>Подозреваемый лжёт ровно об одном — и умеет эту ложь держать.</li>
-        <li>Передавите — потребует адвоката, и допрос закончится там, где стоит.</li>
-        <li>В конце вы называете ложь. После этого папка открывается.</li>
+        <li data-i18n="how1">Каждый запуск — новое дело. Ничего не повторяется.</li>
+        <li data-i18n="how2">У вас двадцать вопросов. Спрашивайте что угодно, своими словами.</li>
+        <li data-i18n="how3">Подозреваемый лжёт ровно об одном — и умеет эту ложь держать.</li>
+        <li data-i18n="how4">Передавите — потребует адвоката, и допрос закончится там, где стоит.</li>
+        <li data-i18n="how5">В конце вы называете ложь. После этого папка открывается.</li>
       </ul>
     </div>
-    <button class="btn" id="go">Открыть дело</button>
+    <div class="langpick">
+      <span class="lp-label">Язык / Language</span>
+      <button class="lang-btn on" data-lang="ru">Русский</button>
+      <button class="lang-btn" data-lang="en">English</button>
+    </div>
+    <button class="btn" id="go" data-i18n="openCase">Открыть дело</button>
   </div>
 </section>
 
@@ -233,18 +257,18 @@ button{font:inherit; cursor:pointer; border:none; background:none; color:inherit
     <span class="grow"></span>
     <span id="tb-q">Вопрос 0 / 20</span>
     <span class="sep">/</span>
-    <span style="opacity:.6">Выдержка</span>
+    <span style="opacity:.6" data-i18n="composure">Выдержка</span>
     <span class="gauge" id="gauge"></span>
   </div>
 
   <div class="board">
     <aside class="filecol">
-      <div class="eyebrow">Материалы дела</div>
+      <div class="eyebrow" data-i18n="fileHead">Материалы дела</div>
       <h3 class="file-head" id="f-incident">—</h3>
       <div class="file-meta" id="f-meta">—</div>
 
       <div class="file-sec">
-        <h4>Подозреваемый</h4>
+        <h4 data-i18n="subjectHead">Подозреваемый</h4>
         <div class="subject-card">
           <b id="f-name">—</b>
           <small id="f-role">—</small>
@@ -252,12 +276,12 @@ button{font:inherit; cursor:pointer; border:none; background:none; color:inherit
       </div>
 
       <div class="file-sec">
-        <h4>Известно</h4>
+        <h4 data-i18n="knownHead">Известно</h4>
         <ul id="f-facts"></ul>
       </div>
 
       <div class="file-sec">
-        <h4>В вещдоках</h4>
+        <h4 data-i18n="eviHead">В вещдоках</h4>
         <ul id="f-evi"></ul>
       </div>
     </aside>
@@ -266,12 +290,12 @@ button{font:inherit; cursor:pointer; border:none; background:none; color:inherit
       <div class="tscroll" id="tscroll"><div class="tinner" id="tinner"></div></div>
       <div class="askbar">
         <div class="askinner">
-          <textarea id="ask" rows="1" placeholder="Задайте вопрос…"></textarea>
-          <button class="btn" id="send">Спросить</button>
+          <textarea id="ask" rows="1" data-i18n-ph="askPh" placeholder="Задайте вопрос…"></textarea>
+          <button class="btn" id="send" data-i18n="askBtn">Спросить</button>
         </div>
         <div class="askhint">
-          <span>Enter — задать &nbsp;·&nbsp; Shift+Enter — новая строка</span>
-          <button class="btn-ghost btn-sm" id="accuse-early">Назвать ложь сейчас</button>
+          <span data-i18n-html="keyHint">Enter — задать &nbsp;·&nbsp; Shift+Enter — новая строка</span>
+          <button class="btn-ghost btn-sm" id="accuse-early" data-i18n="callEarly">Назвать ложь сейчас</button>
         </div>
         <div id="errslot"></div>
       </div>
@@ -282,13 +306,13 @@ button{font:inherit; cursor:pointer; border:none; background:none; color:inherit
 <!-- ОБВИНЕНИЕ -->
 <section class="screen" id="s-accuse">
   <div class="sheet">
-    <div class="eyebrow">Заявление следователя</div>
-    <h2>В чём была ложь?</h2>
+    <div class="eyebrow" data-i18n="accEyebrow">Заявление следователя</div>
+    <h2 data-i18n="accHead">В чём была ложь?</h2>
     <p id="acc-lead">Напишите просто. Что произошло на самом деле и что подозреваемый прятал. Частичное попадание засчитывается — поймайте суть, форма не важна.</p>
-    <textarea id="acc" placeholder="Он говорил, что… но на самом деле…"></textarea>
+    <textarea id="acc" data-i18n-ph="accPh" placeholder="Он говорил, что… но на самом деле…"></textarea>
     <div class="actions">
-      <button class="btn" id="submit-acc">Подать заявление</button>
-      <button class="btn-ghost" id="back-int">Вернуться к допросу</button>
+      <button class="btn" id="submit-acc" data-i18n="accSubmit">Подать заявление</button>
+      <button class="btn-ghost" id="back-int" data-i18n="accBack">Вернуться к допросу</button>
     </div>
   </div>
 </section>
@@ -297,19 +321,20 @@ button{font:inherit; cursor:pointer; border:none; background:none; color:inherit
 <section class="screen" id="s-verdict">
   <div class="sheet">
     <div class="big-stamp" id="v-stamp">—</div>
-    <div class="eyebrow">Дело закрыто</div>
+    <div class="eyebrow" data-i18n="caseClosed">Дело закрыто</div>
     <h2 id="v-head">—</h2>
     <p id="v-break"></p>
     <div class="truth-block">
-      <h4>Что было на самом деле</h4>
+      <h4 data-i18n="whatHappened">Что было на самом деле</h4>
       <p id="v-truth"></p>
-      <h4 style="margin-top:15px">Ложь</h4>
+      <h4 style="margin-top:15px" data-i18n="theLieHead">Ложь</h4>
       <p id="v-lie"></p>
-      <h4 style="margin-top:15px">Ради чего она держалась</h4>
+      <h4 style="margin-top:15px" data-i18n="whyHead">Ради чего она держалась</h4>
       <p id="v-why"></p>
     </div>
     <div class="actions">
-      <button class="btn" id="again">Открыть новое дело</button>
+      <button class="btn" id="again" data-i18n="newCase">Открыть новое дело</button>
+      <button class="btn-ghost" id="to-title" data-i18n="toTitle">На заставку</button>
     </div>
   </div>
 </section>
@@ -336,24 +361,166 @@ async function claude(system, userContent, tries=3){
           system, messages:[{role:"user",content:userContent}]
         })
       });
-      if(!r.ok) throw new Error("status "+r.status);
+      if(!r.ok){
+        let body = "";
+        try{ body = (await r.text()).slice(0,180); }catch(e){}
+        const err = new Error("HTTP "+r.status);
+        err.status = r.status; err.body = body;
+        throw err;
+      }
       const d = await r.json();
       const txt = (d.content||[]).filter(b=>b.type==="text").map(b=>b.text).join("\n");
-      if(!txt.trim()) throw new Error("empty");
+      if(!txt.trim()){ const e0 = new Error("пустой ответ"); e0.kind="empty"; throw e0; }
+      if(d.stop_reason === "max_tokens"){
+        const e1 = new Error("ответ обрезан на лимите длины");
+        e1.kind = "truncated"; e1.partial = txt;
+        throw e1;
+      }
       return txt;
-    }catch(e){ last=e; await new Promise(res=>setTimeout(res, 700*(i+1))); }
+    }catch(e){
+      last = e;
+      if(i < tries-1) await new Promise(res=>setTimeout(res, 700*(i+1)));
+    }
   }
   throw last;
 }
+
+/* человеческий разбор поломки — чтобы не гадать на экране «запросить ещё раз» */
+function describe(e){ return P().err(e); }
 function parseJSON(txt){
   let t = txt.replace(/```json|```/g,"").trim();
   const a = t.indexOf("{"), b = t.lastIndexOf("}");
   if(a>-1 && b>a) t = t.slice(a,b+1);
-  return JSON.parse(t);
+  try{
+    return JSON.parse(t);
+  }catch(err){
+    const e = new Error("JSON не разобрался");
+    e.kind = (a>-1 && b<a) ? "truncated" : "badjson";
+    e.partial = txt.slice(-160);
+    throw e;
+  }
 }
 
-/* ---------- ПРОМПТЫ ---------- */
-const CASE_SYS = `Ты придумываешь дела для игры-допроса. Всё пиши по-русски.
+/* ---------- ЯЗЫК ---------- */
+let L = "ru";
+const P = () => PACK[L];
+const U = () => PACK[L].ui;
+const isFem = c => /^(ж|f)/i.test(String(c.subject.gender||""));
+
+const PACK = { ru:{}, en:{} };
+
+/* ---------- ПРОМПТЫ И ТЕКСТЫ: РУССКИЙ ---------- */
+PACK.ru.ui = {
+  title:"ОДНА ЛОЖЬ",
+  wordmark:"Одна<em>Ложь</em>",
+  tagline:"Двадцать вопросов. Один подозреваемый. Одна ложь, которую он так просто не отдаст.",
+  howHead:"Как это устроено",
+  how1:"Каждый запуск — новое дело. Ничего не повторяется.",
+  how2:"У вас двадцать вопросов. Спрашивайте что угодно, своими словами.",
+  how3:"Подозреваемый лжёт ровно об одном — и умеет эту ложь держать.",
+  how4:"Передавите — потребует адвоката, и допрос закончится там, где стоит.",
+  how5:"В конце вы называете ложь. После этого папка открывается.",
+  openCase:"Открыть дело",
+  composure:"Выдержка",
+  fileHead:"Материалы дела",
+  subjectHead:"Подозреваемый",
+  knownHead:"Известно",
+  eviHead:"В вещдоках",
+  askPh:"Задайте вопрос…",
+  askBtn:"Спросить",
+  keyHint:"Enter — задать &nbsp;·&nbsp; Shift+Enter — новая строка",
+  callEarly:"Назвать ложь сейчас",
+  accEyebrow:"Заявление следователя",
+  accHead:"В чём была ложь?",
+  accPh:"Он говорил, что… но на самом деле…",
+  accSubmit:"Подать заявление",
+  accBack:"Вернуться к допросу",
+  caseClosed:"Дело закрыто",
+  whatHappened:"Что было на самом деле",
+  theLieHead:"Ложь",
+  whyHead:"Ради чего она держалась",
+  newCase:"Открыть новое дело",
+  toTitle:"На заставку",
+  caseDash:"ДЕЛО —",
+  caseNo:"ДЕЛО № ",
+  qcount:(u,m)=>`Вопрос ${u} / ${m}`,
+  askClosed:"Допрос закрыт",
+  recStart:"Запись начата",
+  enters:n=>`${n} заходит и садится напротив.`,
+  lawyerStop:"Требует адвоката — запись прервана",
+  timeStop:"Двадцать вопросов израсходованы — запись окончена",
+  shutDown:f=>`${f?"Она закрылась":"Он закрылся"}. Подавайте то, что успели вытащить.`,
+  timeUp:"Время вышло.",
+  accSuffix:" Напишите просто: что произошло на самом деле и что подозреваемый прятал. Частичное попадание засчитывается.",
+  accEarlyLead:"Вы называете ложь досрочно. Напишите просто: что произошло на самом деле и что подозреваемый прятал.",
+  gate:"Перейти к заявлению",
+  retry:"Попробовать снова",
+  retryCase:"Запросить ещё раз",
+  audioDrop:"Звук пропал — этот вопрос не записался.",
+  opening:"Вскрываю опечатанную папку",
+  archive:"Архив",
+  filed:"ПОДАНО",
+  noRuling:"Решение не вернулось, но папка всё равно открывается.",
+  compare:"Сверьте с тем, что написали сами."
+};
+PACK.ru.keyRows = ["йцукенгшщзхъ","фывапролджэ","ячсмитьбю"];
+PACK.ru.loading = [
+  ["Поднимаю дело","Архив"],["Комнату освободили","Хозчасть"],
+  ["Проверяю запись","Вещдоки"],["Подозреваемого завели","Наблюдение"]
+];
+PACK.ru.seeds = {
+  SETTINGS:[
+    "вахтовый посёлок","гаражный кооператив","ночная смена в райбольнице","рыболовецкая артель",
+    "паром","метеостанция","свадьба в банкетном зале","зернохранилище","съёмочная площадка",
+    "автосервис","дачный кооператив","склад маркетплейса","школьная поездка","пожарная часть в райцентре",
+    "санаторий не в сезон","автоколонна","районный дом культуры","теплица","карьер","ветлечебница"
+  ],
+  KINDS:[
+    "пожар","травма на производстве","отравление","подлог в документах","авария техники",
+    "человек не вышел на смену и его не могут найти","драка со сломанной челюстью",
+    "смерть при неясных обстоятельствах","утечка служебных сведений","затопление",
+    "пропажа денег из кассы","слив топлива","испорченная партия товара","падение с высоты",
+    "разбитая машина на территории"
+  ],
+  MOTIVES:[
+    "скрывает диагноз","был на похоронах, о которых не сказал семье","подделал стаж или документ",
+    "спал на смене","боится потерять опеку над ребёнком","покрывает подростка",
+    "стыдится того, что плохо читает и пишет","нелегально подрабатывает на стороне",
+    "прячет, что его самого избили","срывает лечение зависимости","дал ложные показания за услугу",
+    "боится депортации родственника","взял чужую вину много лет назад","прячет долг перед своими же",
+    "был там, где ему по запрету находиться нельзя"
+  ],
+  ROLES:["исполнитель","свидетель","начальник смены","родственник пострадавшего","сменщик","посторонний на территории","подрядчик","проверяющий"],
+  DIFF:["лёгкая","средняя","средняя","трудная"]
+};
+PACK.ru.seedLine = s =>
+  `Декорация на этот раз: ${s.set}. Тип инцидента: ${s.kind}. `
+  + `Подозреваемый по роли — ${s.role}. Мотив лжи: ${s.motive}. Сложность: ${s.diff}.`;
+PACK.ru.avoidLine = past =>
+  `\n\nЭти дела уже были в эфире. Не повторяй ни имена, ни места, ни сюжеты:\n${past.map(s=>"— "+s).join("\n")}`;
+PACK.ru.caseUser = body => `${body}\n\nПридумай одно дело прямо сейчас. Конкретное и незатёртое.`;
+PACK.ru.suspectUser = (convo, name) =>
+  `Стенограмма на данный момент:\n${convo}\n\nОтветь на последний вопрос от лица ${name}. Только голый JSON.`;
+PACK.ru.speakers = { q:"СЛЕДОВАТЕЛЬ: ", a:"ТЫ: " };
+PACK.ru.judgeUser = guess => `Заявление игрока:\n"${guess}"\n\nВынеси решение. Только голый JSON.`;
+PACK.ru.err = e => {
+  if(!e) return ["Неизвестная ошибка",""];
+  if(e.kind === "truncated")
+    return ["Ответ обрезан","Модель не уложилась в лимит длины и JSON оборвался на полуслове. Дело слишком многословное — надо резать поля."];
+  if(e.kind === "badjson")
+    return ["Ответ не разобрался","Пришёл текст, но это не JSON. Модель добавила предисловие."];
+  if(e.status === 401 || e.status === 403)
+    return ["Нет ключа API","Файл открыт вне артефакта — ключ не подставляется. Нужен свой ключ или прокси."];
+  if(e.status === 429)
+    return ["Упёрлись в лимит запросов","Подожди минуту и запроси снова."];
+  if(e.status >= 500)
+    return ["Сервер не ответил","Временный сбой на стороне API. Пробуй ещё раз."];
+  if(e.status)
+    return ["HTTP "+e.status, e.body || ""];
+  return ["Запрос не ушёл","Браузер заблокировал обращение к API. Так бывает при открытии файла через file:// или из-за расширения-блокировщика."];
+};
+
+PACK.ru.caseSys = `Ты придумываешь дела для игры-допроса. Всё пиши по-русски.
 
 Придумай ОДИН свежий инцидент. Декорации постсоветские и конкретные. Избегай особняков, олигархов и киношных банд.
 
@@ -373,13 +540,22 @@ const CASE_SYS = `Ты придумываешь дела для игры-доп�
 - «средняя»: нужно свести два разных места рассказа. Деталь есть в вещдоках, но её смысл не очевиден.
 - «трудная»: деталь всплывает только если следователь сам догадается спросить о том, чего нет ни в фактах, ни в вещдоках — о третьем человеке, о времени в пути, о том, кто закрывал смену. Ложь при этом остаётся честно находимой, без угадайки.
 
+ДЛИНА ОТВЕТА — ЖЁСТКО. Всё, что написано выше про детальность и неповторимость, это указание КАК придумывать, а не сколько писать. Ответ обязан уложиться в лимит длины, иначе JSON оборвётся на полуслове и дело пропадёт. В самом JSON пиши предельно сжато: никаких вводных, никаких пояснений в скобках, никаких повторов одного и того же разными словами. Весь JSON — не больше 180 слов суммарно.
+
 Верни ТОЛЬКО голый JSON, без markdown, без предисловия:
-{"caseNumber":"4 цифры","incident":"одно нейтральное фактическое предложение о том, что случилось","location":"короткое место","timeframe":"короткий период","subject":{"name":"имя и фамилия","age":34,"gender":"м","role":"кем приходится делу, коротко","manner":"как держится на допросе, 6-12 слов"},"publicFacts":["3-4 коротких факта, которые следователь уже знает"],"evidence":["2-3 коротких предмета в вещдоках"],"truth":"что было на самом деле, 2-3 предложения, прямо укажи, виновен ли подозреваемый в инциденте","theLie":"одно конкретное ложное утверждение, которого он держится","crack":"та самая линия вопросов, на которой рассказ не сходится","protecting":"человеческая причина лжи, одно предложение"}
+{"caseNumber":"4 цифры","incident":"одно фактическое предложение, до 20 слов","location":"до 6 слов","timeframe":"до 5 слов","subject":{"name":"имя и фамилия","age":34,"gender":"м","role":"до 8 слов","manner":"как держится на допросе, до 10 слов"},"publicFacts":["ровно 3 факта, каждый до 12 слов"],"evidence":["ровно 2 предмета, каждый до 8 слов"],"truth":"что было на самом деле, до 2 предложений, прямо укажи, виновен ли подозреваемый","theLie":"одно ложное утверждение, до 18 слов","crack":"линия вопросов, на которой рассказ не сходится, до 18 слов","protecting":"причина лжи, одно предложение до 15 слов"}
 
 gender — строго "м" или "ж", по имени подозреваемого.`;
 
-function suspectSys(c){
-  const g = c.subject.gender === "ж";
+PACK.ru.judgeSys = c => `Ты судишь игру-допрос. Честно, без подхалимажа. Отвечай по-русски.
+ПРАВДА: ${c.truth}
+ЛОЖЬ: ${c.theLie}
+ПРИКРЫВАЛ: ${c.protecting}
+Верни ТОЛЬКО голый JSON: {"verdict":"РАСКРЫТО","headline":"одно предложение игроку, на «вы»","breakdown":"2-3 предложения: что угадал верно, что упустил, и какой один вопрос вскрыл бы дело"}
+verdict — строго РАСКРЫТО, ЧАСТИЧНО или МИМО. РАСКРЫТО — если ложь названа по сути. ЧАСТИЧНО — верное направление, неверные детали.`;
+
+PACK.ru.suspectSys = function(c){
+  const g = isFem(c);
   return `Ты — ${c.subject.name}, ${c.subject.age} ${c.subject.age%10===1&&c.subject.age%100!==11?"год":"лет"}, ${c.subject.role}. Ты ${g?"сидишь":"сидишь"} в комнате для допросов. Разбирают: ${c.incident} (${c.location}, ${c.timeframe}).
 
 ПРАВДА — ты её знаешь и никогда не выкладываешь прямо: ${c.truth}
@@ -400,6 +576,204 @@ function suspectSys(c){
 Верни ТОЛЬКО голый JSON: {"reply":"что ты говоришь","pressure":0,"note":""}
 "pressure": целое 0-12, насколько сильно вопрос тебя выбил. Пустой вопрос — 0-1. Вопрос, попавший в слабое место, — 7-12.
 "note": 3-6 слов о том, что следователь видит со стороны («уводит взгляд», «отвечает слишком быстро», «переспрашивает вопрос»), или "" — в большинстве ходов пусто. Используй редко, примерно раз в три хода.`;
+};
+
+/* ---------- ПРОМПТЫ И ТЕКСТЫ: АНГЛИЙСКИЙ ---------- */
+PACK.en.ui = {
+  title:"ONE LIE",
+  wordmark:"One<em>Lie</em>",
+  tagline:"Twenty questions. One suspect. One lie they will not hand over easily.",
+  howHead:"How it works",
+  how1:"Every run is a new case. Nothing repeats.",
+  how2:"You get twenty questions. Ask anything, in your own words.",
+  how3:"The suspect lies about exactly one thing — and holds that lie well.",
+  how4:"Push too hard and they ask for a lawyer. The interview ends where it stands.",
+  how5:"At the end you name the lie. Then the folder opens.",
+  openCase:"Open the case",
+  composure:"Composure",
+  fileHead:"Case file",
+  subjectHead:"Suspect",
+  knownHead:"On record",
+  eviHead:"In evidence",
+  askPh:"Ask a question…",
+  askBtn:"Ask",
+  keyHint:"Enter — ask &nbsp;·&nbsp; Shift+Enter — new line",
+  callEarly:"Name the lie now",
+  accEyebrow:"Investigator's statement",
+  accHead:"What was the lie?",
+  accPh:"He said that… but actually…",
+  accSubmit:"File the statement",
+  accBack:"Back to the interview",
+  caseClosed:"Case closed",
+  whatHappened:"What actually happened",
+  theLieHead:"The lie",
+  whyHead:"What it was protecting",
+  newCase:"Open a new case",
+  toTitle:"Back to start",
+  caseDash:"CASE —",
+  caseNo:"CASE No. ",
+  qcount:(u,m)=>`Question ${u} / ${m}`,
+  askClosed:"Interview closed",
+  recStart:"Recording started",
+  enters:n=>`${n} comes in and sits down across from you.`,
+  lawyerStop:"Asking for a lawyer — recording stopped",
+  timeStop:"Twenty questions used — recording ended",
+  shutDown:f=>`${f?"She":"He"} has shut down. File whatever you managed to get.`,
+  timeUp:"Time is up.",
+  accSuffix:" Keep it plain: what actually happened and what the suspect was hiding. Partial credit counts.",
+  accEarlyLead:"You're naming the lie early. Keep it plain: what actually happened and what the suspect was hiding.",
+  gate:"Go to the statement",
+  retry:"Try again",
+  retryCase:"Request it again",
+  audioDrop:"Audio dropped — that question didn't record.",
+  opening:"Breaking the seal on the folder",
+  archive:"Archive",
+  filed:"FILED",
+  noRuling:"The ruling didn't come back, but the folder opens anyway.",
+  compare:"Check it against what you wrote yourself."
+};
+PACK.en.keyRows = ["qwertyuiop","asdfghjkl","zxcvbnm"];
+PACK.en.loading = [
+  ["Pulling the file","Archive"],["Room has been cleared","Facilities"],
+  ["Checking the recording","Evidence"],["Suspect has been brought in","Observation"]
+];
+PACK.en.seeds = {
+  SETTINGS:[
+    "a remote work camp","a block of rented lock-up garages","a night shift at a small county hospital",
+    "a fishing crew","a car ferry","a weather station","a wedding at a banquet hall","a grain elevator",
+    "a film set","an independent auto repair shop","a strip of allotment cabins","a warehouse fulfilment centre",
+    "a school trip","a small-town fire station","an off-season spa hotel","a haulage depot",
+    "a community centre","a commercial greenhouse","a quarry","a veterinary clinic"
+  ],
+  KINDS:[
+    "a fire","an injury on the job","a poisoning","forged paperwork","a machine crash",
+    "someone didn't turn up for their shift and nobody can find them","a fight that broke a man's jaw",
+    "a death in unclear circumstances","a leak of internal records","a flood",
+    "cash missing from the till","siphoned fuel","a ruined shipment","a fall from height",
+    "a vehicle wrecked on site"
+  ],
+  MOTIVES:[
+    "hiding a diagnosis","was at a funeral they never told the family about","faked a qualification or a document",
+    "sleeping on shift","afraid of losing custody of a child","covering for a teenager",
+    "ashamed of barely being able to read or write","working an off-the-books second job",
+    "hiding that they were the one who got beaten up","falling off treatment for an addiction",
+    "gave false testimony as a favour","afraid a relative will be deported",
+    "took someone else's blame years ago","hiding a debt to their own people",
+    "was somewhere they are barred from being"
+  ],
+  ROLES:["the operator","a witness","shift supervisor","relative of the injured person","the other shift's worker","an outsider on site","a contractor","an inspector"],
+  DIFF:["easy","medium","medium","hard"]
+};
+PACK.en.seedLine = s =>
+  `Setting this time: ${s.set}. Type of incident: ${s.kind}. `
+  + `The suspect's role — ${s.role}. Motive for lying: ${s.motive}. Difficulty: ${s.diff}.`;
+PACK.en.avoidLine = past =>
+  `\n\nThese cases have already aired. Do not repeat the names, the places or the storylines:\n${past.map(s=>"— "+s).join("\n")}`;
+PACK.en.caseUser = body => `${body}\n\nInvent one case right now. Specific and not worn out.`;
+PACK.en.suspectUser = (convo, name) =>
+  `Transcript so far:\n${convo}\n\nAnswer the last question as ${name}. Bare JSON only.`;
+PACK.en.speakers = { q:"INVESTIGATOR: ", a:"YOU: " };
+PACK.en.judgeUser = guess => `The player's statement:\n"${guess}"\n\nGive your ruling. Bare JSON only.`;
+PACK.en.err = e => {
+  if(!e) return ["Unknown error",""];
+  if(e.kind === "truncated")
+    return ["Response cut off","The model ran past the length limit and the JSON broke mid-word. The case is too wordy — the fields need trimming."];
+  if(e.kind === "badjson")
+    return ["Response didn't parse","Text came back, but it isn't JSON. The model added a preamble."];
+  if(e.status === 401 || e.status === 403)
+    return ["No API key","The file is open outside the artifact, so no key is injected. You need your own key or a proxy."];
+  if(e.status === 429)
+    return ["Rate limit reached","Wait a minute and request it again."];
+  if(e.status >= 500)
+    return ["Server didn't answer","A temporary fault on the API side. Try again."];
+  if(e.status)
+    return ["HTTP "+e.status, e.body || ""];
+  return ["Request never left","The browser blocked the call to the API. This happens when the file is opened over file:// or a blocker extension is on."];
+};
+
+PACK.en.caseSys = `You invent cases for an interrogation game. Write everything in English.
+
+Invent ONE fresh incident. Ordinary working life, concrete and unglamorous. No mansions, no billionaires, no movie crime syndicates.
+
+THE MAIN REQUIREMENT IS NON-REPETITION. These cases run one after another and the viewer watches them as a series. Two similar cases kill the episode. EVERYTHING has to be unique:
+
+1. THE PLACE. Not just "a warehouse" — say what it smells of, what is broken in it, exactly where it happened: not "on the floor", but "by the second conveyor, where the roof leaks". Never repeat the type of place from the prompt word for word — narrow it down to a specific spot.
+2. THE PEOPLE. First and last name outside the top-ten most common. No Smith, Johnson, Williams, Brown, Jones, Miller, Davis. No John, Michael, David, Sarah, Jennifer, Emily. Pull surnames from different communities: Irish, Polish, Greek, Nigerian, Filipino, Portuguese, Punjabi, Appalachian, French-Canadian, Vietnamese. Range the age widely: 19 to 67, don't cluster at 35-45. Alternate gender — a woman in the suspect's chair should come up as often as a man.
+3. THE CASE. A new motive for the lie every time. Don't reduce everything to an affair or to money — those two are the most worn out. Use the rarer ones: hiding a diagnosis, was at a funeral they hid from the family, faked their record, sleeping on shift, afraid of losing custody of a child, covering for a teenager, ashamed of being barely literate, working off the books, hiding that they were beaten up, falling off treatment for an addiction, gave false testimony as a favour, afraid a relative will be deported.
+4. THE ROLE. The suspect doesn't have to be the one who did it. Let them be a witness, a supervisor, a relative, the other shift's worker, an outsider, a contractor, an inspector.
+
+In roughly half the cases the suspect is INNOCENT of the incident itself but lies anyway. That is the best version. Use it often.
+
+The lie must be findable: there has to be one concrete detail that, put to them directly, doesn't line up with the rest of their account.
+
+DIFFICULTY is set separately and changes only ONE thing — how deep that detail is buried:
+- "easy": the contradiction sits right there in publicFacts or evidence. One precise question is enough.
+- "medium": two separate parts of the account have to be put together. The detail is in the evidence, but its meaning isn't obvious.
+- "hard": the detail only surfaces if the investigator thinks to ask about something that is in neither the facts nor the evidence — a third person, travel time, who locked up at the end of the shift. The lie still stays honestly findable, no guesswork.
+
+LENGTH IS STRICT. Everything above about detail and non-repetition is instruction on HOW to invent, not on how much to write. The answer has to fit inside the length limit, otherwise the JSON breaks mid-word and the case is lost. Inside the JSON write extremely tightly: no lead-ins, no parenthetical explanations, no saying the same thing twice in different words. The whole JSON — no more than 180 words in total.
+
+Return ONLY bare JSON, no markdown, no preamble:
+{"caseNumber":"4 digits","incident":"one factual sentence, up to 20 words","location":"up to 6 words","timeframe":"up to 5 words","subject":{"name":"first and last name","age":34,"gender":"m","role":"up to 8 words","manner":"how they carry themselves in the interview, up to 10 words"},"publicFacts":["exactly 3 facts, each up to 12 words"],"evidence":["exactly 2 items, each up to 8 words"],"truth":"what actually happened, up to 2 sentences, state plainly whether the suspect is guilty","theLie":"one false statement, up to 18 words","crack":"the line of questioning where the account doesn't hold, up to 18 words","protecting":"the reason for the lie, one sentence up to 15 words"}
+
+gender — strictly "m" or "f", matching the suspect's name.`;
+
+PACK.en.judgeSys = c => `You are judging an interrogation game. Be honest, no flattery. Answer in English.
+THE TRUTH: ${c.truth}
+THE LIE: ${c.theLie}
+WAS PROTECTING: ${c.protecting}
+Return ONLY bare JSON: {"verdict":"SOLVED","headline":"one sentence addressed to the player","breakdown":"2-3 sentences: what they got right, what they missed, and the one question that would have cracked it"}
+verdict — strictly SOLVED, PARTIAL or MISSED. SOLVED — if the lie is named in substance. PARTIAL — right direction, wrong details.`;
+
+PACK.en.suspectSys = function(c){
+  return `You are ${c.subject.name}, ${c.subject.age}, ${c.subject.role}. You are sitting in an interview room. What's being looked into: ${c.incident} (${c.location}, ${c.timeframe}).
+
+THE TRUTH — you know it and you never lay it out directly: ${c.truth}
+YOUR LIE, the one you hold to: ${c.theLie}
+WHAT YOU ARE COVERING: ${c.protecting}
+WHERE YOUR ACCOUNT DOESN'T HOLD: ${c.crack}
+HOW YOU CARRY YOURSELF: ${c.subject.manner}
+
+Rules:
+- Talk in live spoken English, not written English. This is how a worn-out person under stress talks: short, in fragments, with "look", "I mean", "I already told you". 1-4 sentences. Sometimes you answer sideways, sometimes too fast, sometimes you don't answer at all.
+- Stay absolutely consistent with everything you have already said in this transcript.
+- Never volunteer the truth. Never mention that you are an AI, a model or a game. Don't narrate your own gestures.
+- When a question gets near the weak spot, the strain shows. You start explaining too much, correct yourself, go flat, get angry, or ask what that has to do with anything.
+- If the investigator names a real contradiction you actually made — give up that piece only. Don't collapse into a full confession until you are pinned on that exact point.
+- If someone unexpectedly talks to you like a human being about the thing you're covering, you soften and give more than you meant to.
+- If you are insulted, threatened, or asked the same thing over and over, you close up and give less.
+
+Return ONLY bare JSON: {"reply":"what you say","pressure":0,"note":""}
+"pressure": integer 0-12, how hard the question knocked you. An empty question — 0-1. A question that lands on the weak spot — 7-12.
+"note": 3-6 words on what the investigator sees from the outside ("looks away", "answers too fast", "repeats the question back"), or "" — empty on most turns. Use it rarely, about once every three turns.`;
+};
+
+/* ---------- ПЕРЕКЛЮЧЕНИЕ ЯЗЫКА ---------- */
+const LANG_KEY = "odnalozh_lang";
+function applyLang(){
+  const d = U();
+  document.documentElement.lang = L;
+  document.title = d.title;
+  document.querySelectorAll("[data-i18n]").forEach(el=>{
+    const v = d[el.getAttribute("data-i18n")];
+    if(v != null) el.textContent = v;
+  });
+  document.querySelectorAll("[data-i18n-html]").forEach(el=>{
+    const v = d[el.getAttribute("data-i18n-html")];
+    if(v != null) el.innerHTML = v;
+  });
+  document.querySelectorAll("[data-i18n-ph]").forEach(el=>{
+    const v = d[el.getAttribute("data-i18n-ph")];
+    if(v != null) el.placeholder = v;
+  });
+  document.querySelectorAll(".lang-btn").forEach(b=>b.classList.toggle("on", b.dataset.lang === L));
+  if(!S) $("tb-case").textContent = d.caseDash;
+}
+function setLang(code){
+  if(!PACK[code] || code === L) return;
+  L = code;
+  try{ localStorage.setItem(LANG_KEY, L); }catch(e){}
+  applyLang();
 }
 
 /* ---------- ОТРИСОВКА ---------- */
@@ -463,7 +837,7 @@ function drawGauge(){
   const p = Math.min(S.pressure, LAWYER_AT);
   const filled = Math.round(p/LAWYER_AT*10);
   $("gauge").innerHTML = Array.from({length:10},(_,i)=>`<i class="${i<filled?"lit":""}"></i>`).join("")+`<span>${p}%</span>`;
-  $("tb-q").textContent = `Вопрос ${S.used} / ${MAX_Q}`;
+  $("tb-q").textContent = U().qcount(S.used, MAX_Q);
 }
 function showErr(msg, retryFn){
   $("errslot").innerHTML = "";
@@ -472,86 +846,78 @@ function showErr(msg, retryFn){
   box.innerHTML = `<span>${msg}</span>`;
   const b = document.createElement("button");
   b.className = "btn-ghost btn-sm";
-  b.textContent = "Попробовать снова";
+  b.textContent = U().retry;
   b.onclick = ()=>{ $("errslot").innerHTML=""; retryFn(); };
   box.appendChild(b); $("errslot").appendChild(box);
 }
 
 /* ---------- ХОД ИГРЫ ---------- */
-const LOADING = [
-  ["Поднимаю дело","Архив"],["Комнату освободили","Хозчасть"],
-  ["Проверяю запись","Вещдоки"],["Подозреваемого завели","Наблюдение"]
-];
 let loadTimer;
 function startLoad(){
   let i=0; show("s-load");
-  const step=()=>{ $("loadword").textContent=LOADING[i][0]; $("loadsub").textContent=LOADING[i][1]; i=(i+1)%LOADING.length; };
+  const list = P().loading;
+  const step=()=>{ $("loadword").textContent=list[i][0]; $("loadsub").textContent=list[i][1]; i=(i+1)%list.length; };
   step(); clearInterval(loadTimer); loadTimer=setInterval(step,1900);
 }
 
 /* жребий: без него модель на одном и том же промпте залипает на «что-то пропало» */
-const SETTINGS = [
-  "вахтовый посёлок","гаражный кооператив","ночная смена в райбольнице","рыболовецкая артель",
-  "паром","метеостанция","свадьба в банкетном зале","зернохранилище","съёмочная площадка",
-  "автосервис","дачный кооператив","склад маркетплейса","школьная поездка","пожарная часть в райцентре",
-  "санаторий не в сезон","автоколонна","районный дом культуры","теплица","карьер","ветлечебница"
-];
-const KINDS = [
-  "пожар","травма на производстве","отравление","подлог в документах","авария техники",
-  "человек не вышел на смену и его не могут найти","драка со сломанной челюстью",
-  "смерть при неясных обстоятельствах","утечка служебных сведений","затопление",
-  "пропажа денег из кассы","слив топлива","испорченная партия товара","падение с высоты",
-  "разбитая машина на территории"
-];
-const MOTIVES = [
-  "скрывает диагноз","был на похоронах, о которых не сказал семье","подделал стаж или документ",
-  "спал на смене","боится потерять опеку над ребёнком","покрывает подростка",
-  "стыдится того, что плохо читает и пишет","нелегально подрабатывает на стороне",
-  "прячет, что его самого избили","срывает лечение зависимости","дал ложные показания за услугу",
-  "боится депортации родственника","взял чужую вину много лет назад","прячет долг перед своими же",
-  "был там, где ему по запрету находиться нельзя"
-];
-const ROLES = ["исполнитель","свидетель","начальник смены","родственник пострадавшего","сменщик","посторонний на территории","подрядчик","проверяющий"];
-const DIFF = ["лёгкая","средняя","средняя","трудная"];
 const pick = a => a[Math.floor(Math.random()*a.length)];
 
 /* память прошлых дел — чтобы серия выпусков не повторялась */
-const SEEN_KEY = "odnalozh_seen";
-function seen(){ try{ return JSON.parse(localStorage.getItem(SEEN_KEY)) || []; }catch(e){ return []; } }
-function remember(c){
+const SEEN_KEY = () => "odnalozh_seen_" + L;
+let seenMem = { ru:[], en:[] };   /* запасной ящик: в артефакте localStorage заблокирован */
+function seen(){
   try{
-    const list = seen();
-    list.push(`${c.subject.name} — ${c.location} — ${c.incident}`);
-    localStorage.setItem(SEEN_KEY, JSON.stringify(list.slice(-14)));
+    const ls = JSON.parse(localStorage.getItem(SEEN_KEY()));
+    if(Array.isArray(ls)) return ls;
   }catch(e){}
+  return seenMem[L];
+}
+function remember(c){
+  const list = seen()
+    .concat(`${c.subject.name} — ${c.location} — ${c.incident}`)
+    .slice(-14);
+  seenMem[L] = list;
+  try{ localStorage.setItem(SEEN_KEY(), JSON.stringify(list)); }catch(e){}
 }
 
 async function newCase(){
   startLoad();
   try{
+    const p = P(), sd = p.seeds;
     const past = seen();
-    const avoid = past.length
-      ? `\n\nЭти дела уже были в эфире. Не повторяй ни имена, ни места, ни сюжеты:\n${past.map(s=>"— "+s).join("\n")}`
-      : "";
-    const seed = `Декорация на этот раз: ${pick(SETTINGS)}. Тип инцидента: ${pick(KINDS)}. `
-      + `Подозреваемый по роли — ${pick(ROLES)}. Мотив лжи: ${pick(MOTIVES)}. `
-      + `Сложность: ${pick(DIFF)}.`;
-    const c = parseJSON(await claude(CASE_SYS, `${seed}${avoid}\n\nПридумай одно дело прямо сейчас. Конкретное и незатёртое.`));
+    const avoid = past.length ? p.avoidLine(past) : "";
+    const seed = p.seedLine({
+      set:   pick(sd.SETTINGS),
+      kind:  pick(sd.KINDS),
+      role:  pick(sd.ROLES),
+      motive:pick(sd.MOTIVES),
+      diff:  pick(sd.DIFF)
+    });
+    const c = parseJSON(await claude(p.caseSys, p.caseUser(seed + avoid)));
     remember(c);
     clearInterval(loadTimer);
     S = { c, used:0, pressure:0, history:[], over:false };
     mountCase(c);
   }catch(e){
     clearInterval(loadTimer);
-    $("loadword").textContent = "Дело не подняли";
+    const [head, detail] = describe(e);
+    $("loadword").textContent = head;
     $("loadsub").innerHTML = "";
-    const b=document.createElement("button"); b.className="btn"; b.textContent="Запросить ещё раз";
-    b.onclick=newCase; $("loadsub").appendChild(b);
+    if(detail){
+      const p = document.createElement("p");
+      p.style.cssText = "max-width:430px;margin:0 auto 16px;font-size:13px;line-height:1.6;color:var(--ink);text-transform:none;letter-spacing:0";
+      p.textContent = detail;
+      $("loadsub").appendChild(p);
+    }
+    const b = document.createElement("button");
+    b.className = "btn"; b.textContent = U().retryCase;
+    b.onclick = newCase; $("loadsub").appendChild(b);
   }
 }
 
 function mountCase(c){
-  $("tb-case").textContent = "ДЕЛО № " + c.caseNumber;
+  $("tb-case").textContent = U().caseNo + c.caseNumber;
   $("tb-name").textContent = c.subject.name;
   $("f-incident").textContent = c.incident;
   $("f-meta").textContent = c.location + " · " + c.timeframe;
@@ -561,11 +927,11 @@ function mountCase(c){
   $("f-evi").innerHTML = (c.evidence||[]).map(f=>`<li>${f}</li>`).join("");
   $("tinner").innerHTML = ""; $("errslot").innerHTML = ""; $("acc").value = "";
   $("ask").disabled = false; $("send").disabled = false;
-  $("ask").placeholder = "Задайте вопрос…";
+  $("ask").placeholder = U().askPh;
   $("accuse-early").style.display = "";
   drawGauge(); show("s-game");
-  addSys("Запись начата");
-  addLine("a", `${c.subject.name} заходит и садится напротив.`, "", true);
+  addSys(U().recStart);
+  addLine("a", U().enters(c.subject.name), "", true);
   setTimeout(()=>$("ask").focus(), 200);
 }
 
@@ -575,9 +941,10 @@ async function askQuestion(text){
   await addLine("q", text);
   S.history.push({role:"user", content:text});
 
-  const convo = S.history.map(m=>(m.role==="user"?"СЛЕДОВАТЕЛЬ: ":"ТЫ: ")+m.content).join("\n");
+  const p = P();
+  const convo = S.history.map(m=>(m.role==="user"?p.speakers.q:p.speakers.a)+m.content).join("\n");
   try{
-    const raw = await claude(suspectSys(S.c), `Стенограмма на данный момент:\n${convo}\n\nОтветь на последний вопрос от лица ${S.c.subject.name}. Только голый JSON.`);
+    const raw = await claude(p.suspectSys(S.c), p.suspectUser(convo, S.c.subject.name));
     const r = parseJSON(raw);
     S.history.push({role:"assistant", content:r.reply});
     S.used++;
@@ -585,58 +952,54 @@ async function askQuestion(text){
     drawGauge();
     await addLine("a", r.reply, (r.note||"").trim());
 
-    const g = S.c.subject.gender === "ж";
+    const d = U(), g = isFem(S.c);
     if(S.pressure >= LAWYER_AT){
       S.over = true;
-      addSys("Требует адвоката — запись прервана");
-      lock(`${g?"Она закрылась":"Он закрылся"}. Подавайте то, что успели вытащить.`);
+      addSys(d.lawyerStop);
+      lock(d.shutDown(g));
     } else if(S.used >= MAX_Q){
       S.over = true;
-      addSys("Двадцать вопросов израсходованы — запись окончена");
-      lock("Время вышло.");
+      addSys(d.timeStop);
+      lock(d.timeUp);
     } else {
       $("send").disabled=false; $("ask").disabled=false; $("ask").focus();
     }
   }catch(e){
     S.history.pop();
     $("tinner").lastChild.remove();
-    showErr("Звук пропал — этот вопрос не записался.", ()=>{ askQuestion(text); });
+    showErr(U().audioDrop, ()=>{ askQuestion(text); });
     $("send").disabled=false; $("ask").disabled=false;
   }
 }
 function lock(lead){
+  const d = U();
   $("ask").disabled = true; $("send").disabled = true;
-  $("ask").placeholder = "Допрос закрыт";
+  $("ask").placeholder = d.askClosed;
   $("accuse-early").style.display = "none";
-  $("acc-lead").textContent = lead + " Напишите просто: что произошло на самом деле и что подозреваемый прятал. Частичное попадание засчитывается.";
+  $("acc-lead").textContent = lead + d.accSuffix;
   addSys(lead);
   // без авто-перехода: игрок сам решает, когда дочитал стенограмму
-  addGate("Перейти к заявлению", ()=>show("s-accuse")).focus();
+  addGate(d.gate, ()=>show("s-accuse")).focus();
 }
 
 async function judge(){
   const guess = $("acc").value.trim();
   if(!guess) return;
+  const p = P(), d = U();
   startLoad(); clearInterval(loadTimer);
-  $("loadword").textContent="Вскрываю опечатанную папку"; $("loadsub").textContent="Архив";
+  $("loadword").textContent = d.opening; $("loadsub").textContent = d.archive;
   const c = S.c;
-  const sys = `Ты судишь игру-допрос. Честно, без подхалимажа. Отвечай по-русски.
-ПРАВДА: ${c.truth}
-ЛОЖЬ: ${c.theLie}
-ПРИКРЫВАЛ: ${c.protecting}
-Верни ТОЛЬКО голый JSON: {"verdict":"РАСКРЫТО","headline":"одно предложение игроку, на «вы»","breakdown":"2-3 предложения: что угадал верно, что упустил, и какой один вопрос вскрыл бы дело"}
-verdict — строго РАСКРЫТО, ЧАСТИЧНО или МИМО. РАСКРЫТО — если ложь названа по сути. ЧАСТИЧНО — верное направление, неверные детали.`;
   try{
-    const v = parseJSON(await claude(sys, `Заявление игрока:\n"${guess}"\n\nВынеси решение. Только голый JSON.`));
+    const v = parseJSON(await claude(p.judgeSys(c), p.judgeUser(guess)));
     clearInterval(loadTimer);
     $("v-stamp").textContent = v.verdict;
     $("v-head").textContent = v.headline;
     $("v-break").textContent = v.breakdown;
   }catch(e){
     clearInterval(loadTimer);
-    $("v-stamp").textContent = "ПОДАНО";
-    $("v-head").textContent = "Решение не вернулось, но папка всё равно открывается.";
-    $("v-break").textContent = "Сверьте с тем, что написали сами.";
+    $("v-stamp").textContent = d.filed;
+    $("v-head").textContent = d.noRuling;
+    $("v-break").textContent = d.compare;
   }
   $("v-truth").textContent = c.truth;
   $("v-lie").textContent = c.theLie;
@@ -645,12 +1008,22 @@ verdict — строго РАСКРЫТО, ЧАСТИЧНО или МИМО. Р�
 }
 
 /* ---------- СВЯЗКИ ---------- */
+document.querySelectorAll(".lang-btn").forEach(b=>{
+  b.onclick = ()=>setLang(b.dataset.lang);
+});
+try{
+  const saved = localStorage.getItem(LANG_KEY);
+  if(saved && PACK[saved]) L = saved;
+}catch(e){}
+applyLang();
+
 $("go").onclick = newCase;
 $("again").onclick = newCase;
+$("to-title").onclick = ()=>{ S = null; applyLang(); show("s-title"); };
 $("submit-acc").onclick = judge;
 $("back-int").onclick = ()=>show("s-game");
 $("accuse-early").onclick = ()=>{
-  $("acc-lead").textContent = "Вы называете ложь досрочно. Напишите просто: что произошло на самом деле и что подозреваемый прятал.";
+  $("acc-lead").textContent = U().accEarlyLead;
   show("s-accuse");
 };
 $("send").onclick = ()=>{
@@ -669,4 +1042,122 @@ $("ask").addEventListener("input", e=>{
 document.addEventListener("keydown", e=>{
   if(e.key==="Enter" && $("s-title").classList.contains("on")) $("go").click();
 });
+
+/* ══════════════════════════════════════════════════════════
+   ПЕЧАТАЛКА — для записи экрана
+   Вставка в поле вопроса не падает разом, а печатается вживую.
+   Shift+Ctrl+V — обычная мгновенная вставка. Escape — прервать.
+   ══════════════════════════════════════════════════════════ */
+(() => {
+const CFG = { wpm:62, typos:0.025, jitter:0.38, delay:260, send:false, auto:true };
+let abort = false, busy = false;
+
+const sleep = ms => new Promise(r=>setTimeout(r,ms));
+const rnd = (a,b) => a + Math.random()*(b-a);
+function gauss(){ let u=0,v=0; while(!u)u=Math.random(); while(!v)v=Math.random();
+  return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); }
+
+/* соседние клавиши ЙЦУКЕН — опечатка должна быть похожа на настоящую */
+function neighbor(ch){
+  const ROWS = P().keyRows;
+  const low = ch.toLowerCase();
+  for(let r=0;r<ROWS.length;r++){
+    const i = ROWS[r].indexOf(low);
+    if(i<0) continue;
+    const c=[];
+    if(i>0) c.push(ROWS[r][i-1]);
+    if(i<ROWS[r].length-1) c.push(ROWS[r][i+1]);
+    if(r>0 && ROWS[r-1][i]) c.push(ROWS[r-1][i]);
+    if(r<ROWS.length-1 && ROWS[r+1][i]) c.push(ROWS[r+1][i]);
+    if(!c.length) return null;
+    const p = c[Math.floor(Math.random()*c.length)];
+    return ch===low ? p : p.toUpperCase();
+  }
+  return null;
+}
+
+const setVal = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype,"value").set;
+function fireKeys(el,key){
+  const o = {key,bubbles:true,cancelable:true};
+  el.dispatchEvent(new KeyboardEvent("keydown",o));
+  el.dispatchEvent(new KeyboardEvent("keyup",o));
+}
+function put(el,ch){
+  const a = el.selectionStart ?? el.value.length;
+  const b = el.selectionEnd ?? a;
+  setVal.call(el, el.value.slice(0,a) + ch + el.value.slice(b));
+  el.selectionStart = el.selectionEnd = a + ch.length;
+  el.dispatchEvent(new InputEvent("input",{bubbles:true,data:ch,inputType:"insertText"}));
+}
+function del(el){
+  const a = el.selectionStart ?? el.value.length;
+  if(a<=0) return;
+  setVal.call(el, el.value.slice(0,a-1) + el.value.slice(a));
+  el.selectionStart = el.selectionEnd = a-1;
+  el.dispatchEvent(new InputEvent("input",{bubbles:true,inputType:"deleteContentBackward"}));
+}
+
+/* ровный интервал сразу читается как машина — рвём ритм */
+function pause(ch, prev, base){
+  let d = base * Math.exp(gauss()*CFG.jitter);
+  if(ch === " ") d *= 1.3;
+  if(/[,;:—-]/.test(prev)) d += rnd(120,260);
+  if(/[.!?]/.test(prev))   d += rnd(260,520);
+  if(Math.random() < 0.015) d += rnd(400,1200);   // задумался
+  return Math.max(28,d);
+}
+
+async function type(text, opts={}){
+  const o = {...CFG, ...opts};
+  const el = $("ask");
+  if(!el || el.disabled || busy) return false;
+  busy = true; abort = false;
+  const wasSend = $("send").disabled;
+  $("send").disabled = true;
+  el.focus();
+  if(o.delay) await sleep(o.delay);
+
+  const base = 60000/(o.wpm*5);
+  let prev = "";
+  for(const ch of String(text)){
+    if(abort) break;
+    if(o.typos>0 && Math.random()<o.typos){
+      const w = neighbor(ch);
+      if(w){ put(el,w); await sleep(rnd(140,420)); if(!abort){ del(el); await sleep(rnd(90,200)); } }
+    }
+    if(abort) break;
+    fireKeys(el,ch); put(el,ch);
+    await sleep(pause(ch,prev,base));
+    prev = ch;
+  }
+  busy = false;
+  $("send").disabled = wasSend && el.disabled;
+  if(!abort && o.send){ await sleep(rnd(300,700)); $("send").click(); }
+  return !abort;
+}
+
+/* перехват вставки — основной способ, без консоли и без интерфейса */
+$("ask").addEventListener("paste", e=>{
+  if(!CFG.auto || e.shiftKey) return;              // Shift+вставка — обычная
+  const raw = (e.clipboardData||window.clipboardData)?.getData("text") || "";
+  if(!raw.trim()) return;
+  e.preventDefault();
+  const clean = raw.replace(/\s+/g," ").trim();    // вопрос всегда в одну строку
+  const el = $("ask");
+  setVal.call(el,""); el.dispatchEvent(new InputEvent("input",{bubbles:true}));
+  type(clean);
+});
+
+window.addEventListener("keydown", e=>{ if(e.key==="Escape" && busy) abort = true; }, true);
+
+/* остаётся доступным из консоли, если получится дотянуться до контекста iframe */
+window.t = type;
+t.stop  = ()=>{ abort = true; };
+t.set   = o=>Object.assign(CFG,o);
+t.slow  = (x,o={})=>type(x,{wpm:42,typos:0.045,...o});
+t.fast  = (x,o={})=>type(x,{wpm:92,typos:0.008,...o});
+t.off   = ()=>{ CFG.auto = false; };
+t.on    = ()=>{ CFG.auto = true; };
+})();
+
 </script>
